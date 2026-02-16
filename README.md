@@ -1,4 +1,4 @@
-[url=https://ko-fi.com/K3K81UDF3M][img]https://storage.ko-fi.com/cdn/kofi2.png[/img][/url]
+
 
 # DLTB Configurator
 GUI mod tool to build & install custom PAK tweaks for **Dying Light: The Beast**  
