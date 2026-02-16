@@ -1,39 +1,90 @@
-# DLTB_Configurator
-GUI mod tool to build &amp; install PAK tweaks for Dying Light: The Beast (XP, flashlight, hunger, vehicles, enemies, keybinds)
+# DLTB Configurator
+GUI mod tool to build & install custom PAK tweaks for **Dying Light: The Beast**  
+XP • Flashlight • Hunger • Volatiles • Enemies • Vehicles • Keybinds
 
-DLTB Configurator by Robeloto
-version 0.5b
+> **Status:** Beta  
+> **Spawns:** Disabled since game v1.5+ (game-side changes)
 
-GUI tool to build & install a custom PAK for Dying Light: The Beast.
+---
 
-Download:
-Go to releases and download the latest version.
+## ✅ Download
+Go to **Releases** and download the latest build:
+- **DLTB Configurator.exe** (Windows)
 
-Quick start:
-Run DLTB Configurator.exe
-Set Game Folder
-(Optional) Set Save Folder (backup)
-Apply → Build & Install PAK
+---
 
-Features:
-XP multipliers (Open World + Legend)
-Flashlight presets (drain/regen/colors)
-Enemies - tweak health
-Hunger + restore
-Chase limit
-Volatile tuning + health multipliers
-Vehicle keybinds + health and fuel sliders
-Auto-detect game folder + save-backup
-One-click Build & Install PAK
-Launch game via Steam
+## 🚀 Quick start (EXE)
+1. Run **DLTB Configurator.exe**
+2. Set **Game Folder** (required)
+3. (Optional) Set **Save Folder** (for automatic save backups)
+4. Click **Apply → Build & Install PAK**
+5. Launch the game (Steam button in the tool or start normally)
 
-Notes:
-Hunger restore to 100% does not work.
-Spawns disabled since v1.5+
+---
 
-Troubleshooting:
-“Multiple Steam saves found” → manual path
-Some keybindings might not work for Vehicle
+## ✨ Features
+### XP
+- Open World XP multiplier
+- Legend XP multipliers (difficulty-based)
+- NG+ / Coop multipliers
 
+### Flashlight
+- UV levels tuning (drain / max energy / regen delays)
+- Post-process flashlight colors (regular + UV)
+- Nightmare unlimited toggle
 
+### Hunger
+- Tuning buckets + extra modifiers
+- One-click restore (if supported by current game build)
 
+### Volatiles
+- Perception/profile tuning (pacify / resting / etc.)
+- Health multipliers for volatile/hive/apex
+
+### Enemies / Bosses
+- Human health multipliers per difficulty
+- Advanced: per-tag health multipliers (boss, freak, biter, demolisher, etc.)
+
+### Vehicles
+- Vehicle health scaling (pickup / CTB)
+- Fuel usage + fuel max sliders
+- Vehicle keybind editing (keyboard + mouse tokens)
+
+### Quality-of-life
+- Auto-detect game folder
+- Auto-detect save folder + optional backups
+- One-click Build & Install PAK
+- Launch game via Steam
+
+---
+
+## 🖼 Screenshots
+> Tip: Put images in `/docs/` or `/screenshots/` and link them here.
+
+| Tab | Preview |
+|---|---|
+| Vehicles | ![Vehicles](docs/vehicles.png) |
+| Enemies | ![Enemies](docs/enemies.png) |
+
+---
+
+## ⚠ Notes / Limitations
+- **Spawns disabled since v1.5+** (game-side changes break spawn edits)
+- Some keybinds depend on the game’s enum tokens:
+  - `EKey__...` / `EMouse__...` are defined in `data0.pak/scripts/inputs/inputenums.def`
+- In-game keybind settings may override defaults (reset binds in-game if needed)
+
+---
+
+## 🛠 Build from source (Developers)
+### Requirements
+- Python 3.10+
+- Dependencies:
+  - Pillow
+  - numpy
+  - psutil
+  - (others if you use them)
+
+Install:
+```bash
+pip install -r requirements.txt
