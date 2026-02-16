@@ -1,0 +1,34 @@
+sub main()
+{
+    ActionCost("LightAttack", 1.0); // Dev note: Melee_Fists also apply for this action.
+    ActionCost("FuryAttack", 0.5);
+    ActionCost("PowerAttack", 2.0);
+    ActionCost("FuryPowerAttackLvl2", 2.0);
+    ActionCost("FuryGroundPoundLvl1", 3.0);
+    ActionCost("FuryJump", 3.0);
+    ActionCost("FurySprint", 3.0);
+    ActionCost("FuryWindmill", 3.0);
+    ActionCost("FuryScreamLvl2", 3.0);
+    ActionCost("FuryCharge", 3.0);
+    ActionCost("FuryGrapplingHookLvl2", 3.0);
+    ActionCost("FuryThrowable", 3.0);
+    ActionCost("CM_Stomp", 4.0);
+    ActionCost("Slide", 1.0);
+    ActionCost("GroundPound", 2.0);
+    ActionCost("Kick", 2.0);
+    ActionCost("KickCharged", 3.0);
+    ActionCost("KickWrestle", 4.0);
+    ActionCost("Ram", 3.0);
+    ActionCost("Windmill", 4.0);
+    ActionCost("EnemyJump", 3.0); // Dev note: It also includes cost from generic Jump action.
+    ActionCost("Finisher", 1.0);
+    ActionCost("Jump", 0.0);
+    ActionCost("RopeHookPullEnemy", 3.0);
+    ActionCost("RopeHook", 0.0); // Dev note: It also includes cost from generic Jump action.
+    ActionCost("Shimmy", 0.0); // Dev note: Refers to climb.
+    ActionCost("MeleeWeaponThrow", 3.0); // Dev note: Works only for throwing an melee weapon.
+    ActionCost("WeaponThrow", 3.0); // Dev note: Works for every throwable.
+    ActionCost("Takedown", 0.0);
+    ActionCost("VaultKick", 3.0);
+    ActionCost("KickAir", 3.0);
+}

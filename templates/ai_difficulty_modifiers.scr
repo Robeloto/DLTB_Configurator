@@ -1,0 +1,1195 @@
+sub DifficultyModifiers()
+{
+    Tag() // Default
+    {
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 0.775);
+        MaxHealthMultiplier("Easy", 3, 0.8);
+        MaxHealthMultiplier("Easy", 4, 0.825);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.0);
+        MaxHealthMultiplier("Normal", 3, 0.95);
+        MaxHealthMultiplier("Normal", 4, 0.9);
+        MaxHealthMultiplier("Hard", 1, 1.25);
+        MaxHealthMultiplier("Hard", 2, 1.55);
+        MaxHealthMultiplier("Hard", 3, 1.65);
+        MaxHealthMultiplier("Hard", 4, 1.7);
+        MaxHealthMultiplier("Nightmare", 1, 1.4325);
+        MaxHealthMultiplier("Nightmare", 2, 1.765);
+        MaxHealthMultiplier("Nightmare", 3, 1.875); 
+        MaxHealthMultiplier("Nightmare", 4, 1.975);
+
+        MeleeDamageMultiplier("Easy", 1, 0.75);
+        MeleeDamageMultiplier("Easy", 2, 1.05);
+        MeleeDamageMultiplier("Easy", 3, 1.15);
+        MeleeDamageMultiplier("Easy", 4, 1.2);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.25);
+        MeleeDamageMultiplier("Normal", 3, 1.33);
+        MeleeDamageMultiplier("Normal", 4, 1.4);
+        MeleeDamageMultiplier("Hard", 1, 1.2);
+        MeleeDamageMultiplier("Hard", 2, 1.4);
+        MeleeDamageMultiplier("Hard", 3, 1.55);
+        MeleeDamageMultiplier("Hard", 4, 1.65);
+        MeleeDamageMultiplier("Nightmare", 1, 1.5);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 1.925);
+        MeleeDamageMultiplier("Nightmare", 4, 2.0625);
+
+        RangeDamageMultiplier("Easy", 1, 0.6);
+        RangeDamageMultiplier("Easy", 2, 0.8);
+        RangeDamageMultiplier("Easy", 3, 0.9);
+        RangeDamageMultiplier("Easy", 4, 0.95);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.3);
+        RangeDamageMultiplier("Normal", 4, 1.35);
+        RangeDamageMultiplier("Hard", 1, 1.15);
+        RangeDamageMultiplier("Hard", 2, 1.3);
+        RangeDamageMultiplier("Hard", 3, 1.4);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.25);
+        RangeDamageMultiplier("Nightmare", 2, 1.4);
+        RangeDamageMultiplier("Nightmare", 3, 1.5);
+        RangeDamageMultiplier("Nightmare", 4, 1.65);
+
+        ExplosionDamageMultiplier("Easy", 1, 1.0);
+        ExplosionDamageMultiplier("Easy", 2, 1.0);
+        ExplosionDamageMultiplier("Easy", 3, 1.0);
+        ExplosionDamageMultiplier("Easy", 4, 1.0);
+        ExplosionDamageMultiplier("Normal", 1, 1.0);
+        ExplosionDamageMultiplier("Normal", 2, 1.0);
+        ExplosionDamageMultiplier("Normal", 3, 1.0);
+        ExplosionDamageMultiplier("Normal", 4, 1.0);
+        ExplosionDamageMultiplier("Hard", 1, 1.0);
+        ExplosionDamageMultiplier("Hard", 2, 1.0);
+        ExplosionDamageMultiplier("Hard", 3, 1.0);
+        ExplosionDamageMultiplier("Hard", 4, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 1, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 2, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 3, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 4, 1.0);
+
+        IncomingDamageModifier("Easy", 2, "2_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Easy", 3, "3_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Easy", 4, "4_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Normal", 2, "2_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Normal", 3, "3_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Normal", 4, "4_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Hard", 2, "2_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Hard", 3, "3_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Hard", 4, "4_Player_Coop_AI_DamageTakenMul");
+        IncomingDamageModifier("Nightmare", 1, "1_AI_DamageTakenMul_Nightmare");
+        IncomingDamageModifier("Nightmare", 2, "2_Player_Coop_AI_DamageTakenMul_Nightmare");
+        IncomingDamageModifier("Nightmare", 3, "3_Player_Coop_AI_DamageTakenMul_Nightmare");
+        IncomingDamageModifier("Nightmare", 4, "4_Player_Coop_AI_DamageTakenMul_Nightmare");
+
+        StaminaDecreaseMultiplier("Easy", 1, 1.0);
+        StaminaDecreaseMultiplier("Easy", 2, 0.85);
+        StaminaDecreaseMultiplier("Easy", 3, 0.8);
+        StaminaDecreaseMultiplier("Easy", 4, 0.75);
+        StaminaDecreaseMultiplier("Normal", 1, 1.0);
+        StaminaDecreaseMultiplier("Normal", 2, 0.8);
+        StaminaDecreaseMultiplier("Normal", 3, 0.75);
+        StaminaDecreaseMultiplier("Normal", 4, 0.7);
+        StaminaDecreaseMultiplier("Hard", 1, 1.0);
+        StaminaDecreaseMultiplier("Hard", 2, 0.75);
+        StaminaDecreaseMultiplier("Hard", 3, 0.7);
+        StaminaDecreaseMultiplier("Hard", 4, 0.66);
+        StaminaDecreaseMultiplier("Nightmare", 1, 0.66);
+        StaminaDecreaseMultiplier("Nightmare", 2, 0.60);
+        StaminaDecreaseMultiplier("Nightmare", 3, 0.55);
+        StaminaDecreaseMultiplier("Nightmare", 4, 0.5);
+
+        NewGamePlusMaxHealthCurveMultiplier("Tier_1", "NG_Enemy_Max_Health_Mul_Tier_1");
+        NewGamePlusMaxHealthCurveMultiplier("Tier_4", "NG_Enemy_Max_Health_Mul_Tier_2");
+		NewGamePlusMaxHealthCurveMultiplier("Tier_7", "NG_Enemy_Max_Health_Mul_Tier_3");
+		
+        NewGamePlusDamageCurveMultiplier("Tier_1", "NG_Enemy_Damage_Mul_Tier_1");
+        NewGamePlusDamageCurveMultiplier("Tier_4", "NG_Enemy_Damage_Mul_Tier_2");
+		NewGamePlusDamageCurveMultiplier("Tier_7", "NG_Enemy_Damage_Mul_Tier_3");
+    }
+
+    // IMPORTANT - Overrided difficulty modifiers for specific AI preset defined Tags - use DifficultyModifiersTagName, not ActorTagName
+    
+    Tag("volatile")
+    {        
+        MeleeDamageMultiplier("Easy", 1, 0.525);
+        MeleeDamageMultiplier("Easy", 2, 0.65);
+        MeleeDamageMultiplier("Easy", 3, 0.75);
+        MeleeDamageMultiplier("Easy", 4, 0.85);  
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.1);
+        MeleeDamageMultiplier("Normal", 3, 1.2);
+        MeleeDamageMultiplier("Normal", 4, 1.3);
+        MeleeDamageMultiplier("Hard", 1, 1.0);
+        MeleeDamageMultiplier("Hard", 2, 1.15);
+        MeleeDamageMultiplier("Hard", 3, 1.25);
+        MeleeDamageMultiplier("Hard", 4, 1.35);
+        MeleeDamageMultiplier("Nightmare", 1, 1.0);
+        MeleeDamageMultiplier("Nightmare", 2, 1.2);
+        MeleeDamageMultiplier("Nightmare", 3, 1.3);
+        MeleeDamageMultiplier("Nightmare", 4, 1.4);
+   
+        RangeDamageMultiplier("Easy", 1, 0.4);
+        RangeDamageMultiplier("Easy", 2, 0.6);
+        RangeDamageMultiplier("Easy", 3, 0.7);
+        RangeDamageMultiplier("Easy", 4, 0.75);   
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.1);
+        RangeDamageMultiplier("Normal", 3, 1.2);
+        RangeDamageMultiplier("Normal", 4, 1.3);
+        RangeDamageMultiplier("Hard", 1, 1.0);
+        RangeDamageMultiplier("Hard", 2, 1.15);
+        RangeDamageMultiplier("Hard", 3, 1.25);
+        RangeDamageMultiplier("Hard", 4, 1.35);
+        RangeDamageMultiplier("Nightmare", 1, 1.0);
+        RangeDamageMultiplier("Nightmare", 2, 1.2);
+        RangeDamageMultiplier("Nightmare", 3, 1.3);
+        RangeDamageMultiplier("Nightmare", 4, 1.4);
+    }
+    
+    Tag("boss")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.25);
+        MaxHealthMultiplier("Easy", 3, 1.6);
+        MaxHealthMultiplier("Easy", 4, 1.95);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.4);
+        MaxHealthMultiplier("Normal", 3, 1.75);
+        MaxHealthMultiplier("Normal", 4, 2.1);
+        MaxHealthMultiplier("Hard", 1, 1.55);
+        MaxHealthMultiplier("Hard", 2, 1.9);
+        MaxHealthMultiplier("Hard", 3, 2.25);
+        MaxHealthMultiplier("Hard", 4, 2.6);
+        MaxHealthMultiplier("Nightmare", 1, 1.8625);
+        MaxHealthMultiplier("Nightmare", 2, 2.165);
+        MaxHealthMultiplier("Nightmare", 3, 2.375); 
+        MaxHealthMultiplier("Nightmare", 4, 2.775);
+                
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.05);
+        MeleeDamageMultiplier("Easy", 4, 1.1);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.5);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.3);
+        MeleeDamageMultiplier("Hard", 2, 1.6);
+        MeleeDamageMultiplier("Hard", 3, 1.75);
+        MeleeDamageMultiplier("Hard", 4, 1.85);
+        MeleeDamageMultiplier("Nightmare", 1, 1.55);
+        MeleeDamageMultiplier("Nightmare", 2, 1.85);
+        MeleeDamageMultiplier("Nightmare", 3, 2.05);
+        MeleeDamageMultiplier("Nightmare", 4, 2.35);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.25);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.45);
+        RangeDamageMultiplier("Nightmare", 2, 1.65);
+        RangeDamageMultiplier("Nightmare", 3, 1.85);
+        RangeDamageMultiplier("Nightmare", 4, 2.05);
+    }
+    Tag("freak")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.25);
+        MaxHealthMultiplier("Easy", 3, 1.6);
+        MaxHealthMultiplier("Easy", 4, 1.95);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.4);
+        MaxHealthMultiplier("Normal", 3, 1.75);
+        MaxHealthMultiplier("Normal", 4, 2.1);
+        MaxHealthMultiplier("Hard", 1, 1.55);
+        MaxHealthMultiplier("Hard", 2, 1.9);
+        MaxHealthMultiplier("Hard", 3, 2.25);
+        MaxHealthMultiplier("Hard", 4, 2.6);
+        MaxHealthMultiplier("Nightmare", 1, 1.8625);
+        MaxHealthMultiplier("Nightmare", 2, 2.165);
+        MaxHealthMultiplier("Nightmare", 3, 2.475); 
+        MaxHealthMultiplier("Nightmare", 4, 2.875);
+        
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.05);
+        MeleeDamageMultiplier("Easy", 4, 1.1);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.5);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.25);
+        MeleeDamageMultiplier("Hard", 2, 1.55);
+        MeleeDamageMultiplier("Hard", 3, 1.7);
+        MeleeDamageMultiplier("Hard", 4, 1.8);
+        MeleeDamageMultiplier("Nightmare", 1, 1.55);
+        MeleeDamageMultiplier("Nightmare", 2, 1.85);
+        MeleeDamageMultiplier("Nightmare", 3, 2.05);
+        MeleeDamageMultiplier("Nightmare", 4, 2.35);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.45);
+        RangeDamageMultiplier("Nightmare", 2, 1.65);
+        RangeDamageMultiplier("Nightmare", 3, 1.85);
+        RangeDamageMultiplier("Nightmare", 4, 2.05);
+    }       
+    
+    Tag("biter")
+    {           
+        MaxHealthMultiplier("Easy", 3, 0.65);
+        MaxHealthMultiplier("Easy", 4, 0.55);
+    
+        MaxHealthMultiplier("Normal", 2, 0.9);
+        MaxHealthMultiplier("Normal", 3, 0.75);
+        MaxHealthMultiplier("Normal", 4, 0.65);
+     
+        MaxHealthMultiplier("Hard", 1, 1.15);
+        MaxHealthMultiplier("Hard", 2, 1.1);
+        MaxHealthMultiplier("Hard", 3, 1.0);
+        MaxHealthMultiplier("Hard", 4, 0.9);
+        
+        MaxHealthMultiplier("Nightmare", 1, 1.3925);
+        MaxHealthMultiplier("Nightmare", 2, 1.365);
+        MaxHealthMultiplier("Nightmare", 3, 1.275); 
+        MaxHealthMultiplier("Nightmare", 4, 1.175);
+               
+        MeleeDamageMultiplier("Hard", 3, 1.35);
+        MeleeDamageMultiplier("Hard", 4, 1.4);
+        
+        MeleeDamageMultiplier("Nightmare", 3, 1.625);
+        MeleeDamageMultiplier("Nightmare", 4, 1.7625);
+             
+        IncomingDamageModifier("Easy", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Easy", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Easy", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+    }
+    
+    Tag("biter_boss")
+    {       
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 0.85);
+        MaxHealthMultiplier("Easy", 3, 0.95);
+        MaxHealthMultiplier("Easy", 4, 1.00);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.0);
+        MaxHealthMultiplier("Normal", 3, 1.0);
+        MaxHealthMultiplier("Normal", 4, 1.0);
+        MaxHealthMultiplier("Hard", 1, 1.25);
+        MaxHealthMultiplier("Hard", 2, 1.4);
+        MaxHealthMultiplier("Hard", 3, 1.55);
+        MaxHealthMultiplier("Hard", 4, 1.65);
+        MaxHealthMultiplier("Nightmare", 1, 1.4625);
+        MaxHealthMultiplier("Nightmare", 2, 1.665);
+        MaxHealthMultiplier("Nightmare", 3, 1.975); 
+        MaxHealthMultiplier("Nightmare", 4, 2.175);
+        
+        MeleeDamageMultiplier("Hard", 3, 1.35);
+        MeleeDamageMultiplier("Hard", 4, 1.4);
+        
+        MeleeDamageMultiplier("Nightmare", 3, 1.725);
+        MeleeDamageMultiplier("Nightmare", 4, 1.8625);
+        
+        IncomingDamageModifier("Easy", 2, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Easy", 3, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Easy", 4, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 2, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 3, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 4, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Hard", 2, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Hard", 3, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Hard", 4, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 2, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 3, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 4, "AI_DamageTakenMul_NoScaling_Hard");
+    }
+    
+    Tag("spitter_boss")
+    {       
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 0.85);
+        MaxHealthMultiplier("Easy", 3, 0.95);
+        MaxHealthMultiplier("Easy", 4, 1.00);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.0);
+        MaxHealthMultiplier("Normal", 3, 1.0);
+        MaxHealthMultiplier("Normal", 4, 1.0);
+        MaxHealthMultiplier("Hard", 1, 1.25);
+        MaxHealthMultiplier("Hard", 2, 1.25);
+        MaxHealthMultiplier("Hard", 3, 1.25);
+        MaxHealthMultiplier("Hard", 4, 1.25);
+        MaxHealthMultiplier("Nightmare", 1, 1.325);
+        MaxHealthMultiplier("Nightmare", 2, 1.325);
+        MaxHealthMultiplier("Nightmare", 3, 1.325); 
+        MaxHealthMultiplier("Nightmare", 4, 1.325);        
+        
+        IncomingDamageModifier("Easy", 2, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Easy", 3, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Easy", 4, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 2, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 3, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Normal", 4, "AI_DamageTakenMul_NoScaling");
+        IncomingDamageModifier("Hard", 2, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Hard", 3, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Hard", 4, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 2, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 3, "AI_DamageTakenMul_NoScaling_Hard");
+        IncomingDamageModifier("Nightmare", 4, "AI_DamageTakenMul_NoScaling_Hard");
+        
+    }
+    
+    Tag("viral")
+    {           
+        MaxHealthMultiplier("Easy", 3, 0.65);
+        MaxHealthMultiplier("Easy", 4, 0.55);
+    
+        MaxHealthMultiplier("Normal", 2, 0.9);
+        MaxHealthMultiplier("Normal", 3, 0.75);
+        MaxHealthMultiplier("Normal", 4, 0.65);
+     
+        MaxHealthMultiplier("Hard", 1, 1.15);
+        MaxHealthMultiplier("Hard", 2, 1.1);
+        MaxHealthMultiplier("Hard", 3, 1.0);
+        MaxHealthMultiplier("Hard", 4, 0.95);
+        
+        MaxHealthMultiplier("Nightmare", 1, 1.3325);
+        MaxHealthMultiplier("Nightmare", 2, 1.305);
+        MaxHealthMultiplier("Nightmare", 3, 1.275); 
+        MaxHealthMultiplier("Nightmare", 4, 1.255);
+        
+        MeleeDamageMultiplier("Hard", 3, 1.35);
+        MeleeDamageMultiplier("Hard", 4, 1.4);
+      
+        MeleeDamageMultiplier("Nightmare", 3, 1.625);
+        MeleeDamageMultiplier("Nightmare", 4, 1.7625);
+        
+        IncomingDamageModifier("Easy", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Easy", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Easy", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Normal", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Hard", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 2, "2_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 3, "3_Player_Coop_AI_DamageTakenMul_Blast");
+        IncomingDamageModifier("Nightmare", 4, "4_Player_Coop_AI_DamageTakenMul_Blast");
+    }
+    
+    Tag("demolisher")
+    {           
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 1.45);
+        MaxHealthMultiplier("Easy", 3, 1.65);
+        MaxHealthMultiplier("Easy", 4, 1.75);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.825);
+        MaxHealthMultiplier("Normal", 3, 2.1);
+        MaxHealthMultiplier("Normal", 4, 2.35);
+        MaxHealthMultiplier("Hard", 1, 1.35);
+        MaxHealthMultiplier("Hard", 2, 2.025);
+        MaxHealthMultiplier("Hard", 3, 2.2);
+        MaxHealthMultiplier("Hard", 4, 2.525);
+        MaxHealthMultiplier("Nightmare", 1, 1.6625);
+        MaxHealthMultiplier("Nightmare", 2, 2.265);
+        MaxHealthMultiplier("Nightmare", 3, 2.475); 
+        MaxHealthMultiplier("Nightmare", 4, 2.875);
+    }
+    
+    Tag("goon")
+    {           
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 1.45);
+        MaxHealthMultiplier("Easy", 3, 1.65);
+        MaxHealthMultiplier("Easy", 4, 1.75);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.825);
+        MaxHealthMultiplier("Normal", 3, 2.1);
+        MaxHealthMultiplier("Normal", 4, 2.35);
+        MaxHealthMultiplier("Hard", 1, 1.35);
+        MaxHealthMultiplier("Hard", 2, 2.025);
+        MaxHealthMultiplier("Hard", 3, 2.2);
+        MaxHealthMultiplier("Hard", 4, 2.525);
+        MaxHealthMultiplier("Nightmare", 1, 1.6625);
+        MaxHealthMultiplier("Nightmare", 2, 2.165);
+        MaxHealthMultiplier("Nightmare", 3, 2.475); 
+        MaxHealthMultiplier("Nightmare", 4, 2.875);
+    }
+
+    Tag("suicider")
+    {        
+        ExplosionDamageMultiplier("Easy", 1, 1.0);
+        ExplosionDamageMultiplier("Easy", 2, 1.0);
+        ExplosionDamageMultiplier("Easy", 3, 1.0);
+        ExplosionDamageMultiplier("Easy", 4, 1.0);
+        ExplosionDamageMultiplier("Normal", 1, 1.0);
+        ExplosionDamageMultiplier("Normal", 2, 1.0);
+        ExplosionDamageMultiplier("Normal", 3, 1.0);
+        ExplosionDamageMultiplier("Normal", 4, 1.0);
+        ExplosionDamageMultiplier("Hard", 1, 1.0);
+        ExplosionDamageMultiplier("Hard", 2, 1.0);
+        ExplosionDamageMultiplier("Hard", 3, 1.0);
+        ExplosionDamageMultiplier("Hard", 4, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 1, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 2, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 3, 1.0);
+        ExplosionDamageMultiplier("Nightmare", 4, 1.0);
+    }
+    
+    Tag("human")
+    {           
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 1.25);
+        MaxHealthMultiplier("Easy", 3, 1.35);
+        MaxHealthMultiplier("Easy", 4, 1.45);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.425);
+        MaxHealthMultiplier("Normal", 3, 1.575);
+        MaxHealthMultiplier("Normal", 4, 1.65);
+        MaxHealthMultiplier("Hard", 1, 1.35);
+        MaxHealthMultiplier("Hard", 2, 1.75);
+        MaxHealthMultiplier("Hard", 3, 1.85);
+        MaxHealthMultiplier("Hard", 4, 2.125);
+        MaxHealthMultiplier("Nightmare", 1, 1.7625);
+        MaxHealthMultiplier("Nightmare", 2, 2.065);
+        MaxHealthMultiplier("Nightmare", 3, 2.175); 
+        MaxHealthMultiplier("Nightmare", 4, 2.375);
+    }
+    
+    //Freaks and DLC Bosses
+    
+    Tag("slasher")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 1.0);
+        MaxHealthMultiplier("Easy", 2, 1.25);
+        MaxHealthMultiplier("Easy", 3, 1.6);
+        MaxHealthMultiplier("Easy", 4, 1.95);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.4);
+        MaxHealthMultiplier("Normal", 3, 1.75);
+        MaxHealthMultiplier("Normal", 4, 2.1);
+        MaxHealthMultiplier("Hard", 1, 1.425);
+        MaxHealthMultiplier("Hard", 2, 1.9);
+        MaxHealthMultiplier("Hard", 3, 2.25);
+        MaxHealthMultiplier("Hard", 4, 2.6);
+        MaxHealthMultiplier("Nightmare", 1, 1.985);
+        MaxHealthMultiplier("Nightmare", 2, 2.365);
+        MaxHealthMultiplier("Nightmare", 3, 2.775); 
+        MaxHealthMultiplier("Nightmare", 4, 3.275);
+        
+      
+        MeleeDamageMultiplier("Easy", 1, 0.7);
+        MeleeDamageMultiplier("Easy", 2, 1.05);
+        MeleeDamageMultiplier("Easy", 3, 1.15);
+        MeleeDamageMultiplier("Easy", 4, 1.35);
+        MeleeDamageMultiplier("Normal", 1, 0.9);
+        MeleeDamageMultiplier("Normal", 2, 0.933);
+        MeleeDamageMultiplier("Normal", 3, 1.4);
+        MeleeDamageMultiplier("Normal", 4, 1.65);
+        MeleeDamageMultiplier("Hard", 1, 1.25);
+        MeleeDamageMultiplier("Hard", 2, 1.55);
+        MeleeDamageMultiplier("Hard", 3, 1.7);
+        MeleeDamageMultiplier("Hard", 4, 1.8);
+        MeleeDamageMultiplier("Nightmare", 1, 1.5);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 1.925);
+        MeleeDamageMultiplier("Nightmare", 4, 2.0625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.45);
+        RangeDamageMultiplier("Easy", 2, 0.6);
+        RangeDamageMultiplier("Easy", 3, 0.7);
+        RangeDamageMultiplier("Easy", 4, 0.75);
+        RangeDamageMultiplier("Normal", 1, 0.9);
+        RangeDamageMultiplier("Normal", 2, 1.1);
+        RangeDamageMultiplier("Normal", 3, 1.25);
+        RangeDamageMultiplier("Normal", 4, 1.35);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.375);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.75);
+        RangeDamageMultiplier("Nightmare", 4, 1.8375);
+    }
+    
+    Tag("defect")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.15);
+        MaxHealthMultiplier("Easy", 3, 1.5);
+        MaxHealthMultiplier("Easy", 4, 1.75);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.4);
+        MaxHealthMultiplier("Normal", 3, 1.75);
+        MaxHealthMultiplier("Normal", 4, 2.1);
+        MaxHealthMultiplier("Hard", 1, 1.8); // was 1.55
+        MaxHealthMultiplier("Hard", 2, 2.0);
+        MaxHealthMultiplier("Hard", 3, 2.35);
+        MaxHealthMultiplier("Hard", 4, 2.7);
+        MaxHealthMultiplier("Nightmare", 1, 2.322);
+        MaxHealthMultiplier("Nightmare", 2, 2.765);
+        MaxHealthMultiplier("Nightmare", 3, 3.075); 
+        MaxHealthMultiplier("Nightmare", 4, 3.375);
+                  
+        MeleeDamageMultiplier("Easy", 1, 0.85);
+        MeleeDamageMultiplier("Easy", 2, 1.05);
+        MeleeDamageMultiplier("Easy", 3, 1.25);
+        MeleeDamageMultiplier("Easy", 4, 1.35);
+        MeleeDamageMultiplier("Normal", 1, 1.05);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.5);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.5); // was 1.3
+        MeleeDamageMultiplier("Hard", 2, 1.6);
+        MeleeDamageMultiplier("Hard", 3, 1.75);
+        MeleeDamageMultiplier("Hard", 4, 1.85);
+        MeleeDamageMultiplier("Nightmare", 1, 1.75);
+        MeleeDamageMultiplier("Nightmare", 2, 1.95);
+        MeleeDamageMultiplier("Nightmare", 3, 2.025);
+        MeleeDamageMultiplier("Nightmare", 4, 2.3625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.25);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.475);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.75);
+        RangeDamageMultiplier("Nightmare", 4, 1.9375);
+    }
+    Tag("karen")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.7);
+        MaxHealthMultiplier("Easy", 2, 1.05);
+        MaxHealthMultiplier("Easy", 3, 1.2);
+        MaxHealthMultiplier("Easy", 4, 1.35);
+        MaxHealthMultiplier("Normal", 1, 0.95);
+        MaxHealthMultiplier("Normal", 2, 1.33);
+        MaxHealthMultiplier("Normal", 3, 1.45);
+        MaxHealthMultiplier("Normal", 4, 1.55);
+        MaxHealthMultiplier("Hard", 1, 1.225);
+        MaxHealthMultiplier("Hard", 2, 1.5);
+        MaxHealthMultiplier("Hard", 3, 1.75);
+        MaxHealthMultiplier("Hard", 4, 1.85);
+        MaxHealthMultiplier("Nightmare", 1, 1.5725);
+        MaxHealthMultiplier("Nightmare", 2, 1.765);
+        MaxHealthMultiplier("Nightmare", 3, 1.975); 
+        MaxHealthMultiplier("Nightmare", 4, 2.075);
+        
+        
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.15);
+        MeleeDamageMultiplier("Easy", 4, 1.25);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.5);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.35); //was 1.25, 1.4
+        MeleeDamageMultiplier("Hard", 2, 1.55);
+        MeleeDamageMultiplier("Hard", 3, 1.6);
+        MeleeDamageMultiplier("Hard", 4, 1.65);
+        MeleeDamageMultiplier("Nightmare", 1, 1.4);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 1.925);
+        MeleeDamageMultiplier("Nightmare", 4, 2.0625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.40);
+        RangeDamageMultiplier("Nightmare", 2, 1.575);
+        RangeDamageMultiplier("Nightmare", 3, 1.675);
+        RangeDamageMultiplier("Nightmare", 4, 1.7775);
+    }
+    
+    Tag("behemoth")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 1.05);
+        MaxHealthMultiplier("Easy", 2, 1.65);
+        MaxHealthMultiplier("Easy", 3, 1.85);
+        MaxHealthMultiplier("Easy", 4, 2.05);
+        MaxHealthMultiplier("Normal", 1, 1.4);
+        MaxHealthMultiplier("Normal", 2, 2.05);
+        MaxHealthMultiplier("Normal", 3, 2.3);
+        MaxHealthMultiplier("Normal", 4, 2.55);
+        MaxHealthMultiplier("Hard", 1, 1.6);
+        MaxHealthMultiplier("Hard", 2, 2.45);
+        MaxHealthMultiplier("Hard", 3, 2.6);
+        MaxHealthMultiplier("Hard", 4, 2.8);
+        MaxHealthMultiplier("Nightmare", 1, 2.0625);
+        MaxHealthMultiplier("Nightmare", 2, 3.165);
+        MaxHealthMultiplier("Nightmare", 3, 3.575); 
+        MaxHealthMultiplier("Nightmare", 4, 3.775);
+       
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.25);
+        MeleeDamageMultiplier("Easy", 4, 1.35);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.7);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.25);
+        MeleeDamageMultiplier("Hard", 2, 1.55);
+        MeleeDamageMultiplier("Hard", 3, 1.7);
+        MeleeDamageMultiplier("Hard", 4, 1.8);
+        MeleeDamageMultiplier("Nightmare", 1, 1.5);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 1.925);
+        MeleeDamageMultiplier("Nightmare", 4, 2.0625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.55);
+        RangeDamageMultiplier("Hard", 4, 1.65);
+        RangeDamageMultiplier("Nightmare", 1, 1.475);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.75);
+        RangeDamageMultiplier("Nightmare", 4, 1.9375);
+    }
+    
+    Tag("nemo")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.7);
+        MaxHealthMultiplier("Easy", 2, 1.05);
+        MaxHealthMultiplier("Easy", 3, 1.45);
+        MaxHealthMultiplier("Easy", 4, 1.55);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.35);
+        MaxHealthMultiplier("Normal", 3, 1.8);
+        MaxHealthMultiplier("Normal", 4, 1.95);
+        MaxHealthMultiplier("Hard", 1, 1.375);
+        MaxHealthMultiplier("Hard", 2, 1.705);
+        MaxHealthMultiplier("Hard", 3, 2.05);
+        MaxHealthMultiplier("Hard", 4, 2.185);
+        MaxHealthMultiplier("Nightmare", 1, 1.4925);
+        MaxHealthMultiplier("Nightmare", 2, 2.065);
+        MaxHealthMultiplier("Nightmare", 3, 2.275); 
+        MaxHealthMultiplier("Nightmare", 4, 2.475);
+               
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 1.15);
+        MeleeDamageMultiplier("Easy", 3, 1.45);
+        MeleeDamageMultiplier("Easy", 4, 1.75);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.7);
+        MeleeDamageMultiplier("Normal", 3, 2.0);
+        MeleeDamageMultiplier("Normal", 4, 2.3);
+        MeleeDamageMultiplier("Hard", 1, 1.45);
+        MeleeDamageMultiplier("Hard", 2, 1.65);
+        MeleeDamageMultiplier("Hard", 3, 1.925);
+        MeleeDamageMultiplier("Hard", 4, 2.435);
+        MeleeDamageMultiplier("Nightmare", 1, 1.8);
+        MeleeDamageMultiplier("Nightmare", 2, 2.05);
+        MeleeDamageMultiplier("Nightmare", 3, 2.325);
+        MeleeDamageMultiplier("Nightmare", 4, 2.825);
+        
+        RangeDamageMultiplier("Easy", 1, 0.45);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 2.1);
+        RangeDamageMultiplier("Normal", 3, 2.4725);
+        RangeDamageMultiplier("Normal", 4, 2.775);
+        RangeDamageMultiplier("Hard", 1, 1.35);
+        RangeDamageMultiplier("Hard", 2, 2.50);
+        RangeDamageMultiplier("Hard", 3, 2.75);
+        RangeDamageMultiplier("Hard", 4, 3.45);
+        RangeDamageMultiplier("Nightmare", 1, 1.975);
+        RangeDamageMultiplier("Nightmare", 2, 3.825);
+        RangeDamageMultiplier("Nightmare", 3, 4.45);
+        RangeDamageMultiplier("Nightmare", 4, 5.1375);
+    }
+    
+    Tag("matriarch")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 0.95);
+        MaxHealthMultiplier("Easy", 3, 1.0);
+        MaxHealthMultiplier("Easy", 4, 1.05);
+        MaxHealthMultiplier("Normal", 1, 1.05); //was 1.0
+        MaxHealthMultiplier("Normal", 2, 1.2);
+        MaxHealthMultiplier("Normal", 3, 1.25);
+        MaxHealthMultiplier("Normal", 4, 1.275);
+        MaxHealthMultiplier("Hard", 1, 1.425);
+        MaxHealthMultiplier("Hard", 2, 1.45);
+        MaxHealthMultiplier("Hard", 3, 1.5);
+        MaxHealthMultiplier("Hard", 4, 1.575);
+        MaxHealthMultiplier("Nightmare", 1, 1.8625);
+        MaxHealthMultiplier("Nightmare", 2, 1.965);
+        MaxHealthMultiplier("Nightmare", 3, 2.075); 
+        MaxHealthMultiplier("Nightmare", 4, 2.175);
+              
+        MeleeDamageMultiplier("Easy", 1, 0.65);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.25);
+        MeleeDamageMultiplier("Easy", 4, 1.35);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.55);
+        MeleeDamageMultiplier("Normal", 3, 1.65);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.25);
+        MeleeDamageMultiplier("Hard", 2, 1.7);
+        MeleeDamageMultiplier("Hard", 3, 1.85);
+        MeleeDamageMultiplier("Hard", 4, 2.0);
+        MeleeDamageMultiplier("Nightmare", 1, 1.5);
+        MeleeDamageMultiplier("Nightmare", 2, 2.25);
+        MeleeDamageMultiplier("Nightmare", 3, 2.425);
+        MeleeDamageMultiplier("Nightmare", 4, 2.5625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.4);
+        RangeDamageMultiplier("Normal", 3, 1.45);
+        RangeDamageMultiplier("Normal", 4, 1.55);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.55);
+        RangeDamageMultiplier("Hard", 3, 1.75);
+        RangeDamageMultiplier("Hard", 4, 1.95);
+        RangeDamageMultiplier("Nightmare", 1, 1.475);
+        RangeDamageMultiplier("Nightmare", 2, 1.925);
+        RangeDamageMultiplier("Nightmare", 3, 2.15);
+        RangeDamageMultiplier("Nightmare", 4, 2.375);
+    }
+    
+    Tag("daughter")  //Matriarch daughter
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 0.775);
+        MaxHealthMultiplier("Easy", 3, 0.8);
+        MaxHealthMultiplier("Easy", 4, 0.825);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.0);
+        MaxHealthMultiplier("Normal", 3, 0.95);
+        MaxHealthMultiplier("Normal", 4, 0.9);
+        MaxHealthMultiplier("Hard", 1, 1.25);
+        MaxHealthMultiplier("Hard", 2, 1.55);
+        MaxHealthMultiplier("Hard", 3, 1.65);
+        MaxHealthMultiplier("Hard", 4, 1.7);
+        MaxHealthMultiplier("Nightmare", 1, 1.7625);
+        MaxHealthMultiplier("Nightmare", 2, 2.265);
+        MaxHealthMultiplier("Nightmare", 3, 2.475); 
+        MaxHealthMultiplier("Nightmare", 4, 2.675);
+
+        MeleeDamageMultiplier("Easy", 1, 0.75);
+        MeleeDamageMultiplier("Easy", 2, 1.05);
+        MeleeDamageMultiplier("Easy", 3, 1.15);
+        MeleeDamageMultiplier("Easy", 4, 1.2);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.25);
+        MeleeDamageMultiplier("Normal", 3, 1.33);
+        MeleeDamageMultiplier("Normal", 4, 1.4);
+        MeleeDamageMultiplier("Hard", 1, 1.1);
+        MeleeDamageMultiplier("Hard", 2, 1.4);
+        MeleeDamageMultiplier("Hard", 3, 1.55);
+        MeleeDamageMultiplier("Hard", 4, 1.65);
+        MeleeDamageMultiplier("Nightmare", 1, 1.5);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 1.925);
+        MeleeDamageMultiplier("Nightmare", 4, 2.0625);
+
+        RangeDamageMultiplier("Easy", 1, 0.6);
+        RangeDamageMultiplier("Easy", 2, 0.8);
+        RangeDamageMultiplier("Easy", 3, 0.9);
+        RangeDamageMultiplier("Easy", 4, 0.95);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.3);
+        RangeDamageMultiplier("Normal", 4, 1.35);
+        RangeDamageMultiplier("Hard", 1, 1.05);
+        RangeDamageMultiplier("Hard", 2, 1.3);
+        RangeDamageMultiplier("Hard", 3, 1.4);
+        RangeDamageMultiplier("Hard", 4, 1.55);
+        RangeDamageMultiplier("Nightmare", 1, 1.475);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.75);
+        RangeDamageMultiplier("Nightmare", 4, 1.9375);
+    }
+    
+    Tag("hologram")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.75);
+        MaxHealthMultiplier("Easy", 2, 1.45);
+        MaxHealthMultiplier("Easy", 3, 1.75);
+        MaxHealthMultiplier("Easy", 4, 1.95);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.95);
+        MaxHealthMultiplier("Normal", 3, 2.4);
+        MaxHealthMultiplier("Normal", 4, 2.5);
+        MaxHealthMultiplier("Hard", 1, 1.75);
+        MaxHealthMultiplier("Hard", 2, 2.45);
+        MaxHealthMultiplier("Hard", 3, 2.65);
+        MaxHealthMultiplier("Hard", 4, 3.245);
+        MaxHealthMultiplier("Nightmare", 1, 1.8625);
+        MaxHealthMultiplier("Nightmare", 2, 2.665);
+        MaxHealthMultiplier("Nightmare", 3, 2.975); 
+        MaxHealthMultiplier("Nightmare", 4, 3.675);
+                      
+        MeleeDamageMultiplier("Easy", 1, 0.75);
+        MeleeDamageMultiplier("Easy", 2, 1.55);
+        MeleeDamageMultiplier("Easy", 3, 1.85);
+        MeleeDamageMultiplier("Easy", 4, 2.35);
+        MeleeDamageMultiplier("Normal", 1, 1.175);
+        MeleeDamageMultiplier("Normal", 2, 2.25);
+        MeleeDamageMultiplier("Normal", 3, 2.9);
+        MeleeDamageMultiplier("Normal", 4, 3.25);
+        MeleeDamageMultiplier("Hard", 1, 1.55);
+        MeleeDamageMultiplier("Hard", 2, 2.4);
+        MeleeDamageMultiplier("Hard", 3, 3.78);
+        MeleeDamageMultiplier("Hard", 4, 3.78);
+        MeleeDamageMultiplier("Nightmare", 1, 1.275);
+        MeleeDamageMultiplier("Nightmare", 2, 2.5);
+        MeleeDamageMultiplier("Nightmare", 3, 3.98);
+        MeleeDamageMultiplier("Nightmare", 4, 3.98);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.15);
+        RangeDamageMultiplier("Normal", 2, 1.9);
+        RangeDamageMultiplier("Normal", 3, 2.45);
+        RangeDamageMultiplier("Normal", 4, 2.85);
+        RangeDamageMultiplier("Hard", 1, 1.35);
+        RangeDamageMultiplier("Hard", 2, 2.05);
+        RangeDamageMultiplier("Hard", 3, 2.65);
+        RangeDamageMultiplier("Hard", 4, 3.05);
+        RangeDamageMultiplier("Nightmare", 1, 1.875);
+        RangeDamageMultiplier("Nightmare", 2, 2.425);
+        RangeDamageMultiplier("Nightmare", 3, 3.65);
+        RangeDamageMultiplier("Nightmare", 4, 4.1375);
+    }
+    
+    Tag("superman")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.8);
+        MaxHealthMultiplier("Easy", 2, 1.0);
+        MaxHealthMultiplier("Easy", 3, 1.05);
+        MaxHealthMultiplier("Easy", 4, 1.15);
+        MaxHealthMultiplier("Normal", 1, 1.05);
+        MaxHealthMultiplier("Normal", 2, 1.2);
+        MaxHealthMultiplier("Normal", 3, 1.45);
+        MaxHealthMultiplier("Normal", 4, 1.5);
+        MaxHealthMultiplier("Hard", 1, 1.425);
+        MaxHealthMultiplier("Hard", 2, 1.4);
+        MaxHealthMultiplier("Hard", 3, 1.6);
+        MaxHealthMultiplier("Hard", 4, 1.75);
+        MaxHealthMultiplier("Nightmare", 1, 1.7625);
+        MaxHealthMultiplier("Nightmare", 2, 1.865);
+        MaxHealthMultiplier("Nightmare", 3, 1.975); 
+        MaxHealthMultiplier("Nightmare", 4, 2.075);
+               
+        MeleeDamageMultiplier("Easy", 1, 0.85);
+        MeleeDamageMultiplier("Easy", 2, 0.9);
+        MeleeDamageMultiplier("Easy", 3, 0.95);
+        MeleeDamageMultiplier("Easy", 4, 1.0);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.2);
+        MeleeDamageMultiplier("Normal", 3, 1.3);
+        MeleeDamageMultiplier("Normal", 4, 1.4);
+        MeleeDamageMultiplier("Hard", 1, 1.15);
+        MeleeDamageMultiplier("Hard", 2, 1.25);
+        MeleeDamageMultiplier("Hard", 3, 1.35);
+        MeleeDamageMultiplier("Hard", 4, 1.45);
+        MeleeDamageMultiplier("Nightmare", 1, 1.4);
+        MeleeDamageMultiplier("Nightmare", 2, 1.65);
+        MeleeDamageMultiplier("Nightmare", 3, 1.725);
+        MeleeDamageMultiplier("Nightmare", 4, 1.9625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.75);
+        RangeDamageMultiplier("Easy", 2, 0.1);
+        RangeDamageMultiplier("Easy", 3, 1.15);
+        RangeDamageMultiplier("Easy", 4, 1.2);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.45);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.45);
+        RangeDamageMultiplier("Nightmare", 1, 1.475);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.75);
+        RangeDamageMultiplier("Nightmare", 4, 1.8375);
+    }
+    
+    Tag("aiden")  
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.65);
+        MaxHealthMultiplier("Easy", 3, 2.0);
+        MaxHealthMultiplier("Easy", 4, 2.35);
+        MaxHealthMultiplier("Normal", 1, 1.2); //was 1.0
+        MaxHealthMultiplier("Normal", 2, 2.2);
+        MaxHealthMultiplier("Normal", 3, 2.55);
+        MaxHealthMultiplier("Normal", 4, 2.9);
+        MaxHealthMultiplier("Hard", 1, 1.8); //was 1.55
+        MaxHealthMultiplier("Hard", 2, 2.45);
+        MaxHealthMultiplier("Hard", 3, 3.05);
+        MaxHealthMultiplier("Hard", 4, 3.1);
+        MaxHealthMultiplier("Nightmare", 1, 2.3225);
+        MaxHealthMultiplier("Nightmare", 2, 2.765);
+        MaxHealthMultiplier("Nightmare", 3, 3.375); 
+        MaxHealthMultiplier("Nightmare", 4, 3.575);
+                     
+        MeleeDamageMultiplier("Easy", 1, 1.25);
+        MeleeDamageMultiplier("Easy", 2, 2.55);
+        MeleeDamageMultiplier("Easy", 3, 2.85);
+        MeleeDamageMultiplier("Easy", 4, 3.25);
+        MeleeDamageMultiplier("Normal", 1, 2.225); //was 1.0, 1.1
+        MeleeDamageMultiplier("Normal", 2, 3.9); //was 1.4
+        MeleeDamageMultiplier("Normal", 3, 4.1);
+        MeleeDamageMultiplier("Normal", 4, 4.725);
+        MeleeDamageMultiplier("Hard", 1, 1.8); // was 1.3, 1.5
+        MeleeDamageMultiplier("Hard", 2, 3.75);
+        MeleeDamageMultiplier("Hard", 3, 5.15);
+        MeleeDamageMultiplier("Hard", 4, 5.35);
+        MeleeDamageMultiplier("Nightmare", 1, 2.1465);
+        MeleeDamageMultiplier("Nightmare", 2, 4.4875);
+        MeleeDamageMultiplier("Nightmare", 3, 5.4865);
+        MeleeDamageMultiplier("Nightmare", 4, 6.2625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.1); //was 1.0
+        RangeDamageMultiplier("Normal", 2, 2.2);
+        RangeDamageMultiplier("Normal", 3, 2.35);
+        RangeDamageMultiplier("Normal", 4, 2.5);
+        RangeDamageMultiplier("Hard", 1, 1.3); // was 1.25
+        RangeDamageMultiplier("Hard", 2, 2.05);
+        RangeDamageMultiplier("Hard", 3, 2.55);
+        RangeDamageMultiplier("Hard", 4, 3.0);
+        RangeDamageMultiplier("Nightmare", 1, 1.975);
+        RangeDamageMultiplier("Nightmare", 2, 3.625);
+        RangeDamageMultiplier("Nightmare", 3, 4.75);
+        RangeDamageMultiplier("Nightmare", 4, 4.9375);
+    }
+    
+    Tag("baron")  //final boss human form
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.35);
+        MaxHealthMultiplier("Easy", 3, 1.65);
+        MaxHealthMultiplier("Easy", 4, 2.05);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.5);
+        MaxHealthMultiplier("Normal", 3, 2.0775);
+        MaxHealthMultiplier("Normal", 4, 2.55);
+        MaxHealthMultiplier("Hard", 1, 1.425);
+        MaxHealthMultiplier("Hard", 2, 1.925);
+        MaxHealthMultiplier("Hard", 3, 2.975);
+        MaxHealthMultiplier("Hard", 4, 3.15);
+        MaxHealthMultiplier("Nightmare", 1, 1.9625);
+        MaxHealthMultiplier("Nightmare", 2, 2.565);
+        MaxHealthMultiplier("Nightmare", 3, 3.475); 
+        MaxHealthMultiplier("Nightmare", 4, 3.875);
+                              
+        MeleeDamageMultiplier("Easy", 1, 0.8);
+        MeleeDamageMultiplier("Easy", 2, 0.95);
+        MeleeDamageMultiplier("Easy", 3, 1.15);
+        MeleeDamageMultiplier("Easy", 4, 1.25);
+        MeleeDamageMultiplier("Normal", 1, 1.15);
+        MeleeDamageMultiplier("Normal", 2, 1.33);
+        MeleeDamageMultiplier("Normal", 3, 1.5);
+        MeleeDamageMultiplier("Normal", 4, 1.75);
+        MeleeDamageMultiplier("Hard", 1, 1.25);
+        MeleeDamageMultiplier("Hard", 2, 1.55);
+        MeleeDamageMultiplier("Hard", 3, 1.7);
+        MeleeDamageMultiplier("Hard", 4, 1.8);
+        MeleeDamageMultiplier("Nightmare", 1, 1.75);
+        MeleeDamageMultiplier("Nightmare", 2, 2.05);
+        MeleeDamageMultiplier("Nightmare", 3, 2.225);
+        MeleeDamageMultiplier("Nightmare", 4, 2.4625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.15);
+        RangeDamageMultiplier("Normal", 2, 1.2);
+        RangeDamageMultiplier("Normal", 3, 1.35);
+        RangeDamageMultiplier("Normal", 4, 1.675);
+        RangeDamageMultiplier("Hard", 1, 1.2);
+        RangeDamageMultiplier("Hard", 2, 1.35);
+        RangeDamageMultiplier("Hard", 3, 1.45);
+        RangeDamageMultiplier("Hard", 4, 1.7825);
+        RangeDamageMultiplier("Nightmare", 1, 1.375);
+        RangeDamageMultiplier("Nightmare", 2, 1.525);
+        RangeDamageMultiplier("Nightmare", 3, 1.85);
+        RangeDamageMultiplier("Nightmare", 4, 2.175);
+    }
+    
+    Tag("beast")  //final boss beast form
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.95);
+        MaxHealthMultiplier("Easy", 2, 1.45);
+        MaxHealthMultiplier("Easy", 3, 1.85);
+        MaxHealthMultiplier("Easy", 4, 2.25);
+        MaxHealthMultiplier("Normal", 1, 1.675);
+        MaxHealthMultiplier("Normal", 2, 1.85);
+        MaxHealthMultiplier("Normal", 3, 2.2325);
+        MaxHealthMultiplier("Normal", 4, 2.85);
+        MaxHealthMultiplier("Hard", 1, 1.55);
+        MaxHealthMultiplier("Hard", 2, 2.5);
+        MaxHealthMultiplier("Hard", 3, 2.6);
+        MaxHealthMultiplier("Hard", 4, 3.125);
+        MaxHealthMultiplier("Nightmare", 1, 2.0625);
+        MaxHealthMultiplier("Nightmare", 2, 3.265);
+        MaxHealthMultiplier("Nightmare", 3, 3.575); 
+        MaxHealthMultiplier("Nightmare", 4, 3.975);
+                       
+        MeleeDamageMultiplier("Easy", 1, 0.75);
+        MeleeDamageMultiplier("Easy", 2, 1.35);
+        MeleeDamageMultiplier("Easy", 3, 1.85);
+        MeleeDamageMultiplier("Easy", 4, 2.1);
+        MeleeDamageMultiplier("Normal", 1, 1.15);
+        MeleeDamageMultiplier("Normal", 2, 1.83);
+        MeleeDamageMultiplier("Normal", 3, 2.75);
+        MeleeDamageMultiplier("Normal", 4, 2.95);
+        MeleeDamageMultiplier("Hard", 1, 1.5);
+        MeleeDamageMultiplier("Hard", 2, 2.2);
+        MeleeDamageMultiplier("Hard", 3, 2.55);
+        MeleeDamageMultiplier("Hard", 4, 2.7);
+        MeleeDamageMultiplier("Nightmare", 1, 1.65);
+        MeleeDamageMultiplier("Nightmare", 2, 2.475);
+        MeleeDamageMultiplier("Nightmare", 3, 2.925);
+        MeleeDamageMultiplier("Nightmare", 4, 3.2625);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.275);
+        RangeDamageMultiplier("Normal", 2, 1.8);
+        RangeDamageMultiplier("Normal", 3, 1.95);
+        RangeDamageMultiplier("Normal", 4, 2.05);
+        RangeDamageMultiplier("Hard", 1, 1.45);
+        RangeDamageMultiplier("Hard", 2, 1.75);
+        RangeDamageMultiplier("Hard", 3, 2.00);
+        RangeDamageMultiplier("Hard", 4, 2.1);
+        RangeDamageMultiplier("Nightmare", 1, 1.775);
+        RangeDamageMultiplier("Nightmare", 2, 2.125);
+        RangeDamageMultiplier("Nightmare", 3, 2.25);
+        RangeDamageMultiplier("Nightmare", 4, 2.575);
+    }
+    
+    Tag("baron_boss_add")  //Baron Human form p2 adds
+    {        
+        MaxHealthMultiplier("Easy", 1, 0.85);
+        MaxHealthMultiplier("Easy", 2, 1.05);
+        MaxHealthMultiplier("Easy", 3, 1.1);
+        MaxHealthMultiplier("Easy", 4, 1.35);
+        MaxHealthMultiplier("Normal", 1, 1.0);
+        MaxHealthMultiplier("Normal", 2, 1.25);
+        MaxHealthMultiplier("Normal", 3, 1.35);
+        MaxHealthMultiplier("Normal", 4, 1.7);
+        MaxHealthMultiplier("Hard", 1, 1.55);
+        MaxHealthMultiplier("Hard", 2, 1.8);
+        MaxHealthMultiplier("Hard", 3, 1.95);
+        MaxHealthMultiplier("Hard", 4, 2.15);
+        MaxHealthMultiplier("Nightmare", 1, 1.7625);
+        MaxHealthMultiplier("Nightmare", 2, 2.065);
+        MaxHealthMultiplier("Nightmare", 3, 2.275); 
+        MaxHealthMultiplier("Nightmare", 4, 2.475);
+                      
+        MeleeDamageMultiplier("Easy", 1, 0.75);
+        MeleeDamageMultiplier("Easy", 2, 1.1);
+        MeleeDamageMultiplier("Easy", 3, 1.2);
+        MeleeDamageMultiplier("Easy", 4, 1.25);
+        MeleeDamageMultiplier("Normal", 1, 1.0);
+        MeleeDamageMultiplier("Normal", 2, 1.65);
+        MeleeDamageMultiplier("Normal", 3, 2.3);
+        MeleeDamageMultiplier("Normal", 4, 2.55);
+        MeleeDamageMultiplier("Hard", 1, 1.4);
+        MeleeDamageMultiplier("Hard", 2, 1.7);
+        MeleeDamageMultiplier("Hard", 3, 1.97);
+        MeleeDamageMultiplier("Hard", 4, 2.4);
+        MeleeDamageMultiplier("Nightmare", 1, 1.475);
+        MeleeDamageMultiplier("Nightmare", 2, 1.75);
+        MeleeDamageMultiplier("Nightmare", 3, 2.15);
+        MeleeDamageMultiplier("Nightmare", 4, 2.525);
+        
+        RangeDamageMultiplier("Easy", 1, 0.55);
+        RangeDamageMultiplier("Easy", 2, 0.7);
+        RangeDamageMultiplier("Easy", 3, 0.8);
+        RangeDamageMultiplier("Easy", 4, 0.85);
+        RangeDamageMultiplier("Normal", 1, 1.0);
+        RangeDamageMultiplier("Normal", 2, 1.5);
+        RangeDamageMultiplier("Normal", 3, 1.55);
+        RangeDamageMultiplier("Normal", 4, 1.85);
+        RangeDamageMultiplier("Hard", 1, 1.25);
+        RangeDamageMultiplier("Hard", 2, 1.55);
+        RangeDamageMultiplier("Hard", 3, 1.75);
+        RangeDamageMultiplier("Hard", 4, 1.95);
+        RangeDamageMultiplier("Nightmare", 1, 1.375);
+        RangeDamageMultiplier("Nightmare", 2, 1.625);
+        RangeDamageMultiplier("Nightmare", 3, 1.915);
+        RangeDamageMultiplier("Nightmare", 4, 2.175);
+    }
+       
+}

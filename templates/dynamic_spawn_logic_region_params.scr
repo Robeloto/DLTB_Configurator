@@ -1,0 +1,17 @@
+import "common_dynamic_spawn_logic_region_params.def"
+
+sub main()
+{
+    use CommonParams();
+    
+    CoDynamicSpawnLogicRegionParams("REG_IN")
+    {
+        BaseMaxAICrowdRange("300");
+        MinAltitudeToIncreaseAICrowdRange("10");
+        MaxAltitudeToIncreaseAICrowdRange("50");
+        MaxAICrowdRangeForAltitudeBasedIncrementation("300");
+        MetersAboveGroundToDecreaseCrowdRangeByAIsCount("10");
+        MinAIsCountToDecreaseCrowdRange("999");
+        MaxAIsCountToDecreaseCrowdRange("999");
+    }
+}

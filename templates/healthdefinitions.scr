@@ -1,0 +1,3360 @@
+sub main()
+{
+    //////////////////////////////////////////////////////////////
+    // testing only //////////////////////////////////////////////
+
+    Health("Test_100")
+    {
+        Health("100");
+    }
+
+    Health("Test_20")
+    {
+        Health("20");
+    }
+
+    Health("Test_HealingLimit")
+    {
+        Health("80% of MaxHealth");
+    }
+
+    Health("HealthCalculatedInCode")
+    {
+        Health("?");
+    }
+
+    Health("Test_DamageLimit")
+    {
+        Health("72");
+    }
+
+    Health("Test_VeryLongHealthDefinitionNameThatShouldBeWrappedAroundWhichMeansItShouldBeBrokenIntoLines")
+    {
+        Health("72");
+    }
+    
+    HealthTotalMul("Test_TotalMul")
+    {
+        Health("3");
+    }
+    HealthTotalMul("Test_TotalMul2")
+    {
+        Health("4");
+    }
+
+    //////////////////////////////////////////////////////////////
+
+	Health("HealthBoostNightRunner")
+    {
+        Health("100");
+    }
+
+    Health("HealthRegenerationMaxLevel")
+    {
+        Health("33% of MaxHealth");
+    }
+
+    Health("HealthRegenerationMaxLevel_Hard")
+    {
+        Health("25% of MaxHealth");
+    }
+
+    Health("HealthRegenerationMaxLevelCustom")
+    {
+        Health("?% of MaxHealth");
+    }
+
+	Health("NightRunnerHealthRegenerationMaxLevel")
+    {
+        Health("100% of MaxHealth");
+    }
+	
+	Health("Lunar_HealthRegenerationMaxLevel100")
+    {
+        Health("100% of MaxHealth");
+    }
+
+    Health("Spring_HealthRegenerationMaxLevel65")
+    {
+        Health("65% of MaxHealth");
+    }
+
+    Health("DefaultHealth")
+    {
+        Health("100");
+    }
+
+    Health("DefaultMinHealth")
+    {
+        Health("0");
+    }
+
+    HealthMul("DefaultHealthMul")
+    {
+        Health("+0");
+    }
+
+    Health("DefaultPlayerMinHealth")
+    {
+        Health("0");
+    }
+
+    Health("Dev_ImmortalPlayerMinHealth")
+    {
+        Health("1");
+    }
+
+	Health("DefaultPlayerMinHealthHandsOff")
+    {
+        Health("1");
+    }
+
+    Health("DefaultPlayerHealth")
+    {
+        Health("80");
+    }
+
+    Health("TankHealth")
+    {
+        Health("470");
+    }
+
+    Health("BrawlerHealth")
+    {
+        Health("370");
+    }
+
+    Health("RangedHealth")
+    {
+        Health("320");
+    }
+
+    Health("SpecialistHealth")
+    {
+        Health("370");
+    }
+
+    HealthMul("BaseHealthMul")
+    {
+        Health("+1");
+    }
+
+    HealthMul("BiterLegHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("BiterArmHealthMul")
+    {
+        Health("-0.75");
+    }
+	HealthMul("BiterArmoredArmHealthMul")
+    {
+        Health("-0.25");
+    }
+
+    HealthMul("BiterHeadHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("ViralLegHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("ViralArmHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("ViralHeadHealthMul")
+    {
+        Health("-0.35");
+    }
+
+	HealthMul("SpitterLegHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("SpitterArmHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("SpitterHeadHealthMul")
+    {
+        Health("-0.35");
+    }
+
+	HealthMul("GoonLegHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("GoonArmHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("GoonHeadHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("DefaultHeadHealthMul")
+    {
+        Health("-0.35");
+    }
+
+    HealthMul("DefaultLegHealthMul")
+    {
+        Health("-0.5");
+    }
+
+    HealthMul("DefaultArmHealthMul")
+    {
+        Health("-0.5");
+    }
+
+	HealthMul("DemolisherLegHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("DemolisherArmHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("DemolisherHeadHealthMul")
+    {
+        Health("1");
+    }
+
+    HealthMul("HumanLegHealthMul")
+    {
+        Health("-0.75");
+    }
+
+    HealthMul("HumanArmHealthMul")
+    {
+        Health("-0.75");
+    }
+
+    HealthMul("HumanHeadHealthMul")
+    {
+        Health("-0.50");
+    }
+    Health("Body_001")
+    {
+        Health("1");
+    }
+    Health("Body_010")
+    {
+        Health("10");
+    }
+
+    Health("Body_020")
+    {
+        Health("20");
+    }
+
+	Health("Body_030")
+    {
+        Health("30");
+    }
+
+    Health("Body_040")
+    {
+        Health("40");
+    }
+
+	Health("Body_050")
+    {
+        Health("50");
+    }
+	Health("Body_060")
+    {
+        Health("60");
+    }
+
+    Health("Body_070")
+    {
+        Health("75");
+    }
+
+    Health("Body_075")
+    {
+        Health("75");
+    }
+
+    Health("Body_080")
+    {
+        Health("80");
+    }
+
+    Health("Body_085")
+    {
+        Health("85");
+    }
+
+    Health("Body_090")
+    {
+        Health("90");
+    }
+
+    Health("Body_100")
+    {
+        Health("100");
+    }
+
+    Health("Body_115")
+    {
+        Health("115");
+    }
+
+    Health("Body_120")
+    {
+        Health("120");
+    }
+
+	Health("Body_140")
+    {
+        Health("140");
+    }
+
+    Health("Body_125")
+    {
+        Health("125");
+    }
+
+    Health("Body_150")
+    {
+        Health("150");
+    }
+
+	Health("Body_160")
+    {
+        Health("160");
+    }
+
+    Health("Body_170")
+    {
+        Health("170");
+    }
+
+	Health("Body_180")
+    {
+        Health("180");
+    }
+
+    Health("Body_200")
+    {
+        Health("200");
+    }
+
+    Health("Body_220")
+    {
+        Health("220");
+    }
+
+	Health("Body_225")
+    {
+        Health("225");
+    }
+
+    Health("Body_230")
+    {
+        Health("230");
+    }
+
+    Health("Body_240")
+    {
+        Health("240");
+    }
+
+	Health("Body_260")
+    {
+        Health("260");
+    }
+
+	Health("Body_280")
+    {
+        Health("280");
+    }
+
+	Health("Body_290")
+    {
+        Health("290");
+    }
+
+    Health("Body_300")
+    {
+        Health("300");
+    }
+
+    Health("Body_320")
+    {
+        Health("320");
+    }
+
+    Health("Body_325")
+    {
+        Health("325");
+    }
+
+    Health("Body_340")
+    {
+        Health("340");
+    }
+
+    Health("Body_360")
+    {
+        Health("360");
+    }
+
+    Health("Body_380")
+    {
+        Health("380");
+    }
+
+    Health("Body_400")
+    {
+        Health("400");
+    }
+
+    Health("Body_425")
+    {
+        Health("425");
+    }
+
+    Health("Body_450")
+    {
+        Health("450");
+    }
+    
+	Health("Body_460")
+    {
+        Health("460");
+    }
+
+    Health("Body_500")
+    {
+        Health("500");
+    }
+
+    Health("Body_550")
+    {
+        Health("550");
+    }
+
+    Health("Body_575")
+    {
+        Health("575");
+    }
+
+    Health("Body_615")
+    {
+        Health("615");
+    }
+
+    Health("Body_650")
+    {
+        Health("650");
+    }
+
+    Health("Body_750")
+    {
+        Health("750");
+    }
+
+    Health("Body_840")
+    {
+        Health("840");
+    }
+
+    Health("Body_850")
+    {
+        Health("850");
+    }
+
+    Health("Body_900")
+    {
+        Health("900");
+    }
+
+    Health("Body_920")
+    {
+        Health("920");
+    }
+
+    Health("Body_1000")
+    {
+        Health("1000");
+    }
+	
+	Health("Body_1230")
+    {
+        Health("1230");
+    }
+	
+	Health("Body_100000")
+    {
+        Health("100000");
+    }
+
+    Health("SimpleWithHead")
+    {
+        Health("100");
+    }
+
+    Health("Biter_Level_1")
+    {
+        Health("50");
+    }
+
+    Health("Biter_Level_2")
+    {
+        Health("75");
+    }
+
+    Health("Biter_RGD_1")
+    {
+        Health("80");
+    }
+
+    Health("Biter_RGD_2")
+    {
+        Health("128");
+    }
+
+    Health("Biter_RGD_3")
+    {
+        Health("178");
+    }
+
+    Health("Biter_RGD_4")
+    {
+        Health("260");
+    }
+
+    Health("Biter_RGD_5")
+    {
+        Health("332");
+    }
+
+    Health("Biter_RGD_6")
+    {
+        Health("432");
+    }
+
+    Health("Biter_RGD_7")
+    {
+        Health("566");
+    }
+
+    Health("Biter_RGD_8")
+    {
+        Health("706");
+    }
+
+    Health("Biter_RGD_9")
+    {
+        Health("794");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_1")
+    {
+        Health("50");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_2")
+    {
+        Health("68");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_3")
+    {
+        Health("110");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_4")
+    {
+        Health("220");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_5")
+    {
+        Health("240");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_6")
+    {
+        Health("350");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_7")
+    {
+        Health("510");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_8")
+    {
+        Health("720");
+    }
+
+    Health("Biter_FirearmChallenge_RGD_9")
+    {
+        Health("1100");
+    }
+	
+    Health("Biter_Weak_RGD_1")
+    {
+        Health("40");
+    }
+
+    Health("Biter_Weak_RGD_2")
+    {
+        Health("64");
+    }
+
+    Health("Biter_Weak_RGD_3")
+    {
+        Health("89");
+    }
+
+    Health("Biter_Weak_RGD_4")
+    {
+        Health("130");
+    }
+
+    Health("Biter_Weak_RGD_5")
+    {
+        Health("166");
+    }
+
+    Health("Biter_Weak_RGD_6")
+    {
+        Health("216");
+    }
+
+    Health("Biter_Weak_RGD_7")
+    {
+        Health("283");
+    }
+
+    Health("Biter_Weak_RGD_8")
+    {
+        Health("353");
+    }
+
+    Health("Biter_Weak_RGD_9")
+    {
+        Health("397");
+    }
+
+    Health("Biter_XL_RGD_1")
+    {
+        Health("96");
+    }
+
+    Health("Biter_XL_RGD_2")
+    {
+        Health("154");
+    }
+
+    Health("Biter_XL_RGD_3")
+    {
+        Health("214");
+    }
+
+    Health("Biter_XL_RGD_4")
+    {
+        Health("312");
+    }
+
+    Health("Biter_XL_RGD_5")
+    {
+        Health("398");
+    }
+
+    Health("Biter_XL_RGD_6")
+    {
+        Health("518");
+    }
+
+    Health("Biter_XL_RGD_7")
+    {
+        Health("680");
+    }
+
+    Health("Biter_XL_RGD_8")
+    {
+        Health("848");
+    }
+
+    Health("Biter_XL_RGD_9")
+    {
+        Health("952");
+    }
+	
+	Health("Biter_Backpack_RGD_1")   // 150% * Biter
+    {
+        Health("120");
+    }
+
+    Health("Biter_Backpack_RGD_2")
+    {
+        Health("192");
+    }
+
+    Health("Biter_Backpack_RGD_3")
+    {
+        Health("268");
+    }
+
+    Health("Biter_Backpack_RGD_4")
+    {
+        Health("390");
+    }
+
+    Health("Biter_Backpack_RGD_5")
+    {
+        Health("498");
+    }
+
+    Health("Biter_Backpack_RGD_6")
+    {
+        Health("648");
+    }
+
+    Health("Biter_Backpack_RGD_7")
+    {
+        Health("850");
+    }
+
+    Health("Biter_Backpack_RGD_8")
+    {
+        Health("1060");
+    }
+
+    Health("Biter_Backpack_RGD_9")
+    {
+        Health("1192");
+    }
+
+    Health("Viral_RGD_1")
+    {
+        Health("68");
+    }
+
+    Health("Viral_RGD_2")
+    {
+        Health("101");
+    }
+
+    Health("Viral_RGD_3")
+    {
+        Health("153");
+    }
+
+    Health("Viral_RGD_4")
+    {
+        Health("239");
+    }
+
+    Health("Viral_RGD_5")
+    {
+        Health("364");
+    }
+
+    Health("Viral_RGD_6")
+    {
+        Health("540");
+    }
+
+    Health("Viral_RGD_7")
+    {
+        Health("836");
+    }
+
+    Health("Viral_RGD_8")
+    {
+        Health("1344");
+    }
+
+    Health("Viral_RGD_9")
+    {
+        Health("1720");
+    }
+	
+    Health("Viral_Chase_RGD_1")
+    {
+        Health("74");
+    }
+
+    Health("Viral_Chase_RGD_2")
+    {
+        Health("112");
+    }
+
+    Health("Viral_Chase_RGD_3")
+    {
+        Health("168");
+    }
+
+    Health("Viral_Chase_RGD_4")
+    {
+        Health("263");
+    }
+
+    Health("Viral_Chase_RGD_5")
+    {
+        Health("400");
+    }
+
+    Health("Viral_Chase_RGD_6")
+    {
+        Health("594");
+    }
+
+    Health("Viral_Chase_RGD_7")
+    {
+        Health("920");
+    }
+
+    Health("Viral_Chase_RGD_8")
+    {
+        Health("1478");
+    }
+
+    Health("Viral_Chase_RGD_9")
+    {
+        Health("1865");
+    }
+    Health("Viral_Level_1")
+    {
+        Health("25");
+    }
+
+    Health("Viral_Level_2")
+    {
+        Health("70");
+    }
+
+    Health("Viral_Level_3")
+    {
+        Health("70");
+    }
+
+    Health("Viral_Level_3_playtest_behaviour")
+    {
+        Health("70");
+    }
+
+    Health("Viral_Level_3_playtest_dmg")
+    {
+        Health("70");
+    }
+
+    Health("Viral_Level_3_playtest_hp")
+    {
+        Health("110");
+    }
+
+    Health("Viral_Level_3_playtest_speed")
+    {
+        Health("70");
+    }
+
+    Health("Viral_Level_4")
+    {
+        Health("110");
+    }
+
+    Health("Viral_Level_5")
+    {
+        Health("110");
+    }
+
+    Health("Viral_Lunger")
+    {
+        Health("60");
+    }
+
+    Health("Volatile")
+    {
+        Health("340");
+    }
+
+    Health("Volatile_RGD_1")
+    {
+        Health("1300");
+    }
+
+    Health("Volatile_RGD_2")
+    {
+        Health("1300");
+    }
+
+    Health("Volatile_RGD_3")
+    {
+        Health("1300");
+    }
+
+    Health("Volatile_RGD_4")
+    {
+        Health("1820");
+    }
+
+    Health("Volatile_RGD_5")
+    {
+        Health("1820");
+    }
+
+    Health("Volatile_RGD_6")
+    {
+        Health("2700");
+    }
+
+    Health("Volatile_RGD_7")
+    {
+        Health("4182");
+    }
+
+    Health("Volatile_RGD_8")
+    {
+        Health("6720");
+    }
+
+    Health("Volatile_RGD_9")
+    {
+        Health("9000");
+    }
+	Health("Volatile_Hive_RGD_1")
+    {
+        Health("170");
+    }
+
+    Health("Volatile_Hive_RGD_2")
+    {
+        Health("253");
+    }
+
+    Health("Volatile_Hive_RGD_3")
+    {
+        Health("384");
+    }
+
+    Health("Volatile_Hive_RGD_4")
+    {
+        Health("598");
+    }
+
+    Health("Volatile_Hive_RGD_5")
+    {
+        Health("910");
+    }
+
+    Health("Volatile_Hive_RGD_6")
+    {
+        Health("1350");
+    }
+
+    Health("Volatile_Hive_RGD_7")
+    {
+        Health("2091");
+    }
+
+    Health("Volatile_Hive_RGD_8")
+    {
+        Health("3360");
+    }
+
+    Health("Volatile_Hive_RGD_9")
+    {
+        Health("4240");
+    }
+
+    Health("Bolter_RGD_1")
+    {
+        Health("34");
+    }
+    Health("Bolter_RGD_2")
+    {
+        Health("50");
+    }
+    Health("Bolter_RGD_3")
+    {
+        Health("76");
+    }
+    Health("Bolter_RGD_4")
+    {
+        Health("119");
+    }
+    Health("Bolter_RGD_5")
+    {
+        Health("182");
+    }
+    Health("Bolter_RGD_6")
+    {
+        Health("270");
+    }
+    Health("Bolter_RGD_7")
+    {
+        Health("418");
+    }
+    Health("Bolter_RGD_8")
+    {
+        Health("672");
+    }
+    Health("Bolter_RGD_9")
+    {
+        Health("848");
+    }
+
+    Health("Banshee_RGD_1")
+    {
+        Health("85");
+    }
+    Health("Banshee_RGD_2")
+    {
+        Health("148");
+    }
+    Health("Banshee_RGD_3")
+    {
+        Health("228");
+    }
+    Health("Banshee_RGD_4")
+    {
+        Health("377");
+    }
+    Health("Banshee_RGD_5")
+    {
+        Health("560");
+    }
+    Health("Banshee_RGD_6")
+    {
+        Health("870");
+    }
+    Health("Banshee_RGD_7")
+    {
+        Health("1419");
+    }
+    Health("Banshee_RGD_8")
+    {
+        Health("2360");
+    }
+    Health("Banshee_RGD_9")
+    {
+        Health("2650");
+    }
+    
+    Health("Banshee_Weak_RGD_1")
+    {
+        Health("14-28");
+    }
+    Health("Banshee_Weak_RGD_2")
+    {
+        Health("15-30");
+    }
+    Health("Banshee_Weak_RGD_3")
+    {
+        Health("38-76");
+    }
+    Health("Banshee_Weak_RGD_4")
+    {
+        Health("63-126");
+    }
+    Health("Banshee_Weak_RGD_5")
+    {
+        Health("94-187");
+    }
+    Health("Banshee_Weak_RGD_6")
+    {
+        Health("145-290");
+    }
+    Health("Banshee_Weak_RGD_7")
+    {
+        Health("237-473");
+    }
+    Health("Banshee_Weak_RGD_8")
+    {
+        Health("393-787");
+    }
+    Health("Banshee_Weak_RGD_9")
+    {
+        Health("442-883");
+    }
+
+    Health("Hag_RGD_1")
+    {
+        Health("90");
+    }
+    Health("Hag_RGD_2")
+    {
+        Health("160");
+    }
+    Health("Hag_RGD_3")
+    {
+        Health("240");
+    }
+    Health("Hag_RGD_4")
+    {
+        Health("390");
+    }
+    Health("Hag_RGD_5")
+    {
+        Health("580");
+    }
+    Health("Hag_RGD_6")
+    {
+        Health("920");
+    }
+    Health("Hag_RGD_7")
+    {
+        Health("1650");
+    }
+    Health("Hag_RGD_8")
+    {
+        Health("2600");
+    }
+    Health("Hag_RGD_9")
+    {
+        Health("3500");
+    }
+	
+	Health("Charger_RGD_1")
+    {
+        Health("119");
+    }
+    Health("Charger_RGD_2")
+    {
+        Health("177");
+    }
+    Health("Charger_RGD_3")
+    {
+        Health("268");
+    }
+    Health("Charger_RGD_4")
+    {
+        Health("418");
+    }
+    Health("Charger_RGD_5")
+    {
+        Health("637");
+    }
+    Health("Charger_RGD_6")
+    {
+        Health("945");
+    }
+    Health("Charger_RGD_7")
+    {
+        Health("1463");
+    }
+    Health("Charger_RGD_8")
+    {
+        Health("2352");
+    }
+    Health("Charger_RGD_9")
+    {
+        Health("2968");
+    }
+	
+	Health("Obstructor_RGD_1")
+    {
+        Health("51");
+    }
+    Health("Obstructor_RGD_2")
+    {
+        Health("75");
+    }
+    Health("Obstructor_RGD_3")
+    {
+        Health("115");
+    }
+    Health("Obstructor_RGD_4")
+    {
+        Health("179");
+    }
+    Health("Obstructor_RGD_5")
+    {
+        Health("273");
+    }
+    Health("Obstructor_RGD_6")
+    {
+        Health("405");
+    }
+    Health("Obstructor_RGD_7")
+    {
+        Health("627");
+    }
+    Health("Obstructor_RGD_8")
+    {
+        Health("1008");
+    }
+    Health("Obstructor_RGD_9")
+    {
+        Health("1272");
+    }
+	
+	Health("Corruptor_RGD_1")
+    {
+        Health("535");
+    }
+    Health("Corruptor_RGD_2")
+    {
+        Health("885");
+    }
+    Health("Corruptor_RGD_3")
+    {
+        Health("1344");
+    }
+    Health("Corruptor_RGD_4")
+    {
+        Health("2093");
+    }
+    Health("Corruptor_RGD_5")
+    {
+        Health("3185");
+    }
+    Health("Corruptor_RGD_6")
+    {
+        Health("5198"); //4725
+    }
+    Health("Corruptor_RGD_7")
+    {
+        Health("7610"); //7318
+    }
+    Health("Corruptor_RGD_8")
+    {
+        Health("11760");
+    }
+    Health("Corruptor_RGD_9")
+    {
+        Health("19292"); //14840
+    }
+	
+	Health("Corruptor_Phase_2_Health")
+    {
+        Health("66% of MaxHealth");
+    }
+	Health("Corruptor_Phase_3_Health")
+    {
+        Health("33% of MaxHealth");
+    }
+    Health("Body_Spitter")
+    {
+        Health("50");
+    }
+
+    Health("Spitter_RGD_1")
+    {
+        Health("68");
+    }
+
+    Health("Spitter_RGD_2")
+    {
+        Health("101");
+    }
+
+    Health("Spitter_RGD_3")
+    {
+        Health("153");
+    }
+
+    Health("Spitter_RGD_4")
+    {
+        Health("239");
+    }
+
+    Health("Spitter_RGD_5")
+    {
+        Health("364");
+    }
+
+    Health("Spitter_RGD_6")
+    {
+        Health("540");
+    }
+
+    Health("Spitter_RGD_7")
+    {
+        Health("836");
+    }
+
+    Health("Spitter_RGD_8")
+    {
+        Health("1344");
+    }
+
+    Health("Spitter_RGD_9")
+    {
+        Health("1720");
+    }
+
+    Health("Goon")
+    {
+        Health("500");
+    }
+    Health("Goon_RGD_1")
+    {
+        Health("425");
+    }
+    Health("Goon_RGD_2")
+    {
+        Health("632");
+    }
+    Health("Goon_RGD_3")
+    {
+        Health("960");
+    }
+    Health("Goon_RGD_4")
+    {
+        Health("1495");
+    }
+    Health("Goon_RGD_5")
+    {
+        Health("2275");
+    }
+    Health("Goon_RGD_6")
+    {
+        Health("3375");
+    }
+    Health("Goon_RGD_7")
+    {
+        Health("5227");
+    }
+    Health("Goon_RGD_8")
+    {
+        Health("8400");
+    }
+    Health("Goon_RGD_9")
+    {
+        Health("11250");
+    }
+    Health("Demolisher")
+    {
+        Health("500");
+    }
+    Health("Demolisher_RGD_1")
+    {
+        Health("595");
+    }
+    Health("Demolisher_RGD_2")
+    {
+        Health("885");
+    }
+    Health("Demolisher_RGD_3")
+    {
+        Health("1344");
+    }
+    Health("Demolisher_RGD_4")
+    {
+        Health("2093");
+    }
+    Health("Demolisher_RGD_5")
+    {
+        Health("3185");
+    }
+    Health("Demolisher_RGD_6")
+    {
+        Health("4725");
+    }
+    Health("Demolisher_RGD_7")
+    {
+        Health("7318");
+    }
+    Health("Demolisher_RGD_8")
+    {
+        Health("11760");
+    }
+    Health("Demolisher_RGD_9")
+    {
+        Health("14840");
+    }
+    Health("Demolisher_Gorilla")
+    {
+        Health("500");
+    }
+    Health("Demolisher_Gorilla_RGD_1")
+    {
+        Health("600");
+    }
+    Health("Demolisher_Gorilla_RGD_2")
+    {
+        Health("890");
+    }
+    Health("Demolisher_Gorilla_RGD_3")
+    {
+        Health("1400");
+    }
+    Health("Demolisher_Gorilla_RGD_4")
+    {
+        Health("2100");
+    }
+    Health("Demolisher_Gorilla_RGD_5")
+    {
+        Health("3200");
+    }
+    Health("Demolisher_Gorilla_RGD_6")
+    {
+        Health("4800");
+    }
+    Health("Demolisher_Gorilla_RGD_7")
+    {
+        Health("7400");
+    }
+    Health("Demolisher_Gorilla_RGD_8")
+    {
+        Health("12000");
+    }
+    Health("Demolisher_Gorilla_RGD_9")
+    {
+        Health("15000");
+    }
+	Health("Zombie_Boss_RGD_1")
+    {
+        Health("340");
+    }
+    Health("Zombie_Boss_RGD_2")
+    {
+        Health("506");
+    }
+    Health("Zombie_Boss_RGD_3")
+    {
+        Health("768");
+    }
+    Health("Zombie_Boss_RGD_4")
+    {
+        Health("1196");
+    }
+    Health("Zombie_Boss_RGD_5")
+    {
+        Health("1820");
+    }
+    Health("Zombie_Boss_RGD_6")
+    {
+        Health("2700");
+    }
+    Health("Zombie_Boss_RGD_7")
+    {
+        Health("4182");
+    }
+    Health("Zombie_Boss_RGD_8")
+    {
+        Health("6720");
+    }
+    Health("Zombie_Boss_RGD_9")
+    {
+        Health("8480");
+    }
+    Health("Screamer_RGD_1")
+    {
+        Health("51");
+    }
+    Health("Screamer_RGD_2")
+    {
+        Health("75");
+    }
+    Health("Screamer_RGD_3")
+    {
+        Health("115");
+    }
+    Health("Screamer_RGD_4")
+    {
+        Health("179");
+    }
+    Health("Screamer_RGD_5")
+    {
+        Health("273");
+    }
+    Health("Screamer_RGD_6")
+    {
+        Health("405");
+    }
+    Health("Screamer_RGD_7")
+    {
+        Health("627");
+    }
+    Health("Screamer_RGD_8")
+    {
+        Health("1008");
+    }
+    Health("Screamer_RGD_9")
+    {
+        Health("1272");
+    }
+    Health("Waltz_Heavy_RGD_1")
+    {
+        Health("595");
+    }
+    Health("Waltz_Heavy_RGD_2")
+    {
+        Health("885");
+    }
+    Health("Waltz_Heavy_RGD_3")
+    {
+        Health("1344");
+    }
+    Health("Waltz_Heavy_RGD_4")
+    {
+        Health("2093");
+    }
+    Health("Waltz_Heavy_RGD_5")
+    {
+        Health("3185");
+    }
+    Health("Waltz_Heavy_RGD_6")
+    {
+        Health("4725");
+    }
+    Health("Waltz_Heavy_RGD_7")
+    {
+        Health("7318");
+    }
+    Health("Waltz_Heavy_RGD_8")
+    {
+        Health("11760");
+    }
+    Health("Waltz_Heavy_RGD_9")
+    {
+        Health("14840");
+    }
+	Health("Waltz_Fog_RGD_1")
+    {
+        Health("450");
+    }
+    Health("Waltz_Fog_RGD_2")
+    {
+        Health("700");
+    }
+    Health("Waltz_Fog_RGD_3")
+    {
+        Health("1000");
+    }
+    Health("Waltz_Fog_RGD_4")
+    {
+        Health("1600");
+    }
+    Health("Waltz_Fog_RGD_5")
+    {
+        Health("2400");
+    }
+    Health("Waltz_Fog_RGD_6")
+    {
+        Health("3500");
+    }
+    Health("Waltz_Fog_RGD_7")
+    {
+        Health("5500");
+    }
+    Health("Waltz_Fog_RGD_8")
+    {
+        Health("8500");
+    }
+    Health("Waltz_Fog_RGD_9")
+    {
+        Health("12500");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_1")
+    {
+        Health("300");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_2")
+    {
+        Health("450");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_3")
+    {
+        Health("700");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_4")
+    {
+        Health("1050");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_5")
+    {
+        Health("1600");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_6")
+    {
+        Health("2500");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_7")
+    {
+        Health("3600");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_8")
+    {
+        Health("6000");
+    }
+    Health("Waltz_Hostile_Mission_Veronika_RGD_9")
+    {
+        Health("9200");
+    }
+    Health("Waltz_Jumper_RGD_1")
+    {
+        Health("595");
+    }
+    Health("Waltz_Jumper_RGD_2")
+    {
+        Health("885");
+    }
+    Health("Waltz_Jumper_RGD_3")
+    {
+        Health("1344");
+    }
+    Health("Waltz_Jumper_RGD_4")
+    {
+        Health("2093");
+    }
+    Health("Waltz_Jumper_RGD_5")
+    {
+        Health("3185");
+    }
+    Health("Waltz_Jumper_RGD_6")
+    {
+        Health("4725");
+    }
+    Health("Waltz_Jumper_RGD_7")
+    {
+        Health("7318");
+    }
+    Health("Waltz_Jumper_RGD_8")
+    {
+        Health("11760");
+    }
+    Health("Waltz_Jumper_RGD_9")
+    {
+        Health("14840");
+    }
+    Health("Waltz_Fury_RGD_1")
+    {
+        Health("8400");
+    }
+    Health("Waltz_Fury_RGD_2")
+    {
+        Health("12000");
+    }
+    Health("Waltz_Fury_RGD_3")
+    {
+        Health("18000");
+    }
+    Health("Waltz_Fury_RGD_4")
+    {
+        Health("25200");
+    }
+    Health("Waltz_Fury_RGD_5")
+    {
+        Health("36000");
+    }
+    Health("Waltz_Fury_RGD_6")
+    {
+        Health("48000");
+    }
+    Health("Waltz_Fury_RGD_7")
+    {
+        Health("66000");
+    }
+    Health("Waltz_Fury_RGD_8")
+    {
+        Health("90000");
+    }
+    Health("Waltz_Fury_RGD_9")
+    {
+        Health("120000");
+    }
+	
+	Health("test_Human_Lvl_1")
+    {
+        Health("100");
+    }
+
+    Health("test_Human_Lvl_2")
+    {
+        Health("150");
+    }
+
+    Health("test_head_cut")
+    {
+        Health("70");
+    }
+
+    Health("Body_100_Immortal")
+    {
+        Health("100");
+    }
+
+    Health("Suicider_Health")
+    {
+        Health("50");
+    }
+
+    Health("Suicider_RGD_1")
+    {
+        Health("34");
+    }
+
+    Health("Suicider_RGD_2")
+    {
+        Health("50");
+    }
+
+    Health("Suicider_RGD_3")
+    {
+        Health("76");
+    }
+
+    Health("Suicider_RGD_4")
+    {
+        Health("119");
+    }
+
+    Health("Suicider_RGD_5")
+    {
+        Health("182");
+    }
+
+    Health("Suicider_RGD_6")
+    {
+        Health("270");
+    }
+
+    Health("Suicider_RGD_7")
+    {
+        Health("418");
+    }
+
+    Health("Suicider_RGD_8")
+    {
+        Health("672");
+    }
+
+    Health("Suicider_RGD_9")
+    {
+        Health("848");
+    }
+
+    HealthMul("SuiciderLegHealthMul")
+    {
+        Health("-0.99");
+    }
+
+    HealthMul("SuiciderHeadHealthMul")
+    {
+        Health("-0.99");
+    }
+
+    Health("Body_100_Immortal_MinHealth")
+    {
+        Health("1");
+    }
+
+    HealthMul("AIDefaultCoopMaxHealthMul")
+    {
+        Health("+0");
+    }
+
+    HealthMul("AIHealthPercToRestore")
+    {
+        Health("-0.2");
+    }
+
+    HealthMul("Player_HealthInfection")
+    {
+        Health("?");
+    }
+
+    Health("Player_MaxHealthModifier")
+    {
+        Health("?");
+    }
+	
+	Health("Player_BaseHPPerLevel")
+    {
+        Health("?");
+    }
+
+    HealthTotalMul("Player_MaxHealthTotalMul")
+    {
+        Health("?");
+    }
+	
+	HealthTotalMul("Player_MaxHealthAddFromLevel")
+    {
+        Health("?");
+    }
+
+    Health("Player_MaxAntizineHealth")
+    {
+        Health("?");
+    }
+
+    Health("Player_SetAntizineHealth")
+    {
+        Health("?");
+    }
+
+    Health("CoHealth_Health")
+    {
+        Health("?");
+    }
+
+    Health("CoHealth_MaxHealth")
+    {
+        Health("?");
+    }
+
+    Health("Player_E32018HandsOffDemoMinHealth")
+    {
+        Health("10");
+    }
+
+    Health("Player_AfterDeathHealth")
+    {
+        Health("100% of MaxHealth");
+    }
+
+    Health("Player_LoadHealth")
+    {
+        Health("?");
+    }
+
+    Health("Player_ResolveReplication")
+    {
+        Health("?");
+    }
+
+    Health("AI_ResolveReplication")
+    {
+        Health("?");
+    }
+
+    Health("Player_DebugSetHealth")
+    {
+        Health("?");
+    }
+
+    Health("Player_DelayedRespawnLocalPlayer")
+    {
+        Health("1");
+    }
+
+    Health("Player_OnDropHealth")
+    {
+        Health("1");
+    }
+
+    Health("Player_LevelUp")
+    {
+        Health("?");
+    }
+
+    Health("Player_PlayerPostprocessTest_K")
+    {
+        Health("1");
+    }
+
+    Health("Player_PlayerPostprocessTest_L")
+    {
+        Health("1");
+    }
+
+    Health("Player_QuestsSetHealthPhase")
+    {
+        Health("?");
+    }
+
+    Health("Player_QuestsRollbackSetHealth")
+    {
+        Health("?");
+    }
+
+    Health("Player_StoryHealthNode")
+    {
+        Health("?");
+    }
+
+    Health("Player_StoryHealthPercentageNode")
+    {
+        Health("?");
+    }
+
+    Health("Player_TutorialMedKit")
+    {
+        Health("?");
+    }
+
+    Health("GameDI_Invoke1_Default")
+    {
+        Health("100% of MaxHealth");
+    }
+
+    Health("GameDI_Invoke2_Default")
+    {
+        Health("100% of MaxHealth");
+    }
+
+    HealthMul("PlayerState_StackCount")
+    {
+        Health("?");
+    }
+
+    Health("AntizinCapacityUpgradeHealth")
+    {
+        Health("20");
+    }
+	
+    Health("FT_Health_Upgrade")
+    {
+        Health("100");
+    }
+
+	Health("LevelUpUpgradeHealth")
+    {
+        Health("20");
+    }
+
+    HealthMul("Item_MaxHealthBuff")
+    {
+        Health("+0.5");
+    }
+
+    Health("bp_hanging_body")
+    {
+        Health("0.0001");
+    }
+
+    Health("WeaponBreakTestMonkeyVictimHealth")
+    {
+        Health("10000000");
+    }
+
+	Health("Monkey_LastSpawnedAIHP")
+    {
+        Health("?");
+    }
+
+	// Armour
+    Health("armour_light")
+    {
+        Health("10");
+    }
+
+    Health("armour_medium")
+    {
+        Health("20");
+    }
+
+    Health("armour_heavy")
+    {
+        Health("250");
+    }
+
+	// Animals
+    Health("wolf")
+    {
+        Health("75");
+    }
+
+    Health("gazelle")
+    {
+        Health("20");
+    }
+
+    Health("heron")
+    {
+        Health("20");
+    }
+
+    // Bandits
+    Health("TwoHanded_Bandit_RGD_1")
+    {
+        Health("170");
+    }
+    Health("TwoHanded_Bandit_RGD_2")
+    {
+        Health("253");
+    }
+    Health("TwoHanded_Bandit_RGD_3")
+    {
+        Health("384");
+    }
+    Health("TwoHanded_Bandit_RGD_4")
+    {
+        Health("598");
+    }
+    Health("TwoHanded_Bandit_RGD_5")
+    {
+        Health("910");
+    }
+    Health("TwoHanded_Bandit_RGD_6")
+    {
+        Health("1350");
+    }
+    Health("TwoHanded_Bandit_RGD_7")
+    {
+        Health("2091");
+    }
+    Health("TwoHanded_Bandit_RGD_8")
+    {
+        Health("3360");
+    }
+    Health("TwoHanded_Bandit_RGD_9")
+    {
+        Health("4240");
+    }
+
+    Health("Archer_RGD_1")
+    {
+        Health("51");
+    }
+    Health("Archer_RGD_2")
+    {
+        Health("75");
+    }
+    Health("Archer_RGD_3")
+    {
+        Health("115");
+    }
+    Health("Archer_RGD_4")
+    {
+        Health("179");
+    }
+    Health("Archer_RGD_5")
+    {
+        Health("273");
+    }
+    Health("Archer_RGD_6")
+    {
+        Health("405");
+    }
+    Health("Archer_RGD_7")
+    {
+        Health("627");
+    }
+    Health("Archer_RGD_8")
+    {
+        Health("1008");
+    }
+    Health("Archer_RGD_9")
+    {
+        Health("1272");
+    }
+
+    Health("Spearman_RGD_1")
+    {
+        Health("102");
+    }
+    Health("Spearman_RGD_2")
+    {
+        Health("151");
+    }
+    Health("Spearman_RGD_3")
+    {
+        Health("230");
+    }
+    Health("Spearman_RGD_4")
+    {
+        Health("358");
+    }
+    Health("Spearman_RGD_5")
+    {
+        Health("546");
+    }
+    Health("Spearman_RGD_6")
+    {
+        Health("810");
+    }
+    Health("Spearman_RGD_7")
+    {
+        Health("1254");
+    }
+    Health("Spearman_RGD_8")
+    {
+        Health("2016");
+    }
+    Health("Spearman_RGD_9")
+    {
+        Health("2544");
+    }
+	
+	Health("OneHanded_RGD_1")
+    {
+        Health("102");
+    }
+    Health("OneHanded_RGD_2")
+    {
+        Health("151");
+    }
+    Health("OneHanded_RGD_3")
+    {
+        Health("230");
+    }
+    Health("OneHanded_RGD_4")
+    {
+        Health("358");
+    }
+    Health("OneHanded_RGD_5")
+    {
+        Health("546");
+    }
+    Health("OneHanded_RGD_6")
+    {
+        Health("810");
+    }
+    Health("OneHanded_RGD_7")
+    {
+        Health("1254");
+    }
+    Health("OneHanded_RGD_8")
+    {
+        Health("2016");
+    }
+    Health("OneHanded_RGD_9")
+    {
+        Health("2544");
+    }
+	
+	Health("OneHanded_Fodder_RGD_1") 
+    {
+        Health("68");
+    }
+    Health("OneHanded_Fodder_RGD_2")
+    {
+        Health("101");
+    }
+    Health("OneHanded_Fodder_RGD_3")
+    {
+        Health("153");
+    }
+    Health("OneHanded_Fodder_RGD_4")
+    {
+        Health("239");
+    }
+    Health("OneHanded_Fodder_RGD_5")
+    {
+        Health("364");
+    }
+    Health("OneHanded_Fodder_RGD_6")
+    {
+        Health("540");
+    }
+    Health("OneHanded_Fodder_RGD_7")
+    {
+        Health("836");
+    }
+    Health("OneHanded_Fodder_RGD_8")
+    {
+        Health("1344");
+    }
+    Health("OneHanded_Fodder_RGD_9")
+    {
+        Health("1696");
+    }
+    HealthTotalMul("AIDifficultyHealthTotalMul")
+    {
+        Health("?");
+    }
+    Health("Demolisher_SGT")
+    {
+        Health("4500");
+    }
+	Health("Freak2")
+    {
+        Health("2000");
+    }
+    
+	//Tower Raid
+	
+	Health("Biter_TowerRaid_Theme1")
+    {
+        Health("830");
+    }
+	Health("Biter_TowerRaid_Theme2")
+    {
+        Health("1153");
+    }
+	Health("Biter_TowerRaid_Theme3")
+    {
+        Health("1602");
+    }
+	Health("Biter_TowerRaid_Theme4")
+    {
+        Health("2198");
+    }
+	
+	Health("Biter_XL_TowerRaid_Theme1")
+    {
+        Health("900");
+    }
+	Health("Biter_XL_TowerRaid_Theme2")
+    {
+        Health("1251");
+    }
+	Health("Biter_XL_TowerRaid_Theme3")
+    {
+        Health("1738");
+    }
+	Health("Biter_XL_TowerRaid_Theme4")
+    {
+        Health("2385");
+    }
+	
+	Health("Biter_Weak_TowerRaid_Theme1")
+    {
+        Health("313");
+    }
+	Health("Biter_Weak_TowerRaid_Theme2")
+    {
+        Health("359");
+    }
+	Health("Biter_Weak_TowerRaid_Theme3")
+    {
+        Health("406");
+    }
+	Health("Biter_Weak_TowerRaid_Theme4")
+    {
+        Health("453");
+    }
+	
+	Health("Viral_TowerRaid_Theme1")
+    {
+        Health("105");
+    }
+	Health("Viral_TowerRaid_Theme2")
+    {
+        Health("121");
+    }
+	Health("Viral_TowerRaid_Theme3")
+    {
+        Health("137");
+    }
+	Health("Viral_TowerRaid_Theme4")
+    {
+        Health("200");
+    }
+	
+	Health("Suicider_TowerRaid_Theme1")
+    {
+        Health("890");
+    }
+	Health("Suicider_TowerRaid_Theme2")
+    {
+        Health("1024");
+    }
+	Health("Suicider_TowerRaid_Theme3")
+    {
+        Health("1212");
+    }
+	Health("Suicider_TowerRaid_Theme4")
+    {
+        Health("1352");
+    }
+	
+	Health("Charger_TowerRaid_Theme1")
+    {
+        Health("3116");
+    }
+	Health("Charger_TowerRaid_Theme2")
+    {
+        Health("3584");
+    }
+	Health("Charger_TowerRaid_Theme3")
+    {
+        Health("4244");
+    }
+	Health("Charger_TowerRaid_Theme4")
+    {
+        Health("4733");
+    }
+	
+	Health("Banshee_TowerRaid_Theme1")
+    {
+        Health("2783");
+    }
+	Health("Banshee_TowerRaid_Theme2")
+    {
+        Health("3199");
+    }
+	Health("Banshee_TowerRaid_Theme3")
+    {
+        Health("3790");
+    }
+	Health("Banshee_TowerRaid_Theme4")
+    {
+        Health("4226");
+    }
+	
+	Health("Spitter_TowerRaid_Theme1")
+    {
+        Health("1806");
+    }
+	Health("Spitter_TowerRaid_Theme2")
+    {
+        Health("2077");
+    }
+	Health("Spitter_TowerRaid_Theme3")
+    {
+        Health("2460");
+    }
+	Health("Spitter_TowerRaid_Theme4")
+    {
+        Health("2743");
+    }
+	
+	Health("Goon_TowerRaid_Theme1")
+    {
+        Health("11813");
+    }
+	Health("Goon_TowerRaid_Theme2")
+    {
+        Health("14231");
+    }
+	Health("Goon_TowerRaid_Theme3")
+    {
+        Health("16819");
+    }
+	Health("Goon_TowerRaid_Theme4")
+    {
+        Health("18759");
+    }
+	
+	Health("Demolisher_TowerRaid_Theme1")
+    {
+        Health("15882");
+    }
+	Health("Demolisher_TowerRaid_Theme2")
+    {
+        Health("18773");
+    }
+	Health("Demolisher_TowerRaid_Theme3")
+    {
+        Health("22186");
+    }
+	Health("Demolisher_TowerRaid_Theme4")
+    {
+        Health("24746");
+    }
+	
+	Health("Volatile_TowerRaid_Theme1")
+    {
+        Health("7070");
+        //Health("9450");
+    }
+	Health("Volatile_TowerRaid_Theme2")
+    {
+        Health("8484");
+        //Health("11385");
+    }
+	Health("Volatile_TowerRaid_Theme3")
+    {
+        Health("10028");
+        //Health("13455");
+    }
+	Health("Volatile_TowerRaid_Theme4")
+    {
+        Health("11182");
+        //Health("15008");
+    }
+	
+	Health("Volatile_Hive_TowerRaid_Theme1")
+    {
+        Health("4452");
+    }
+	Health("Volatile_Hive_TowerRaid_Theme2")
+    {
+        Health("5364");
+    }
+	Health("Volatile_Hive_TowerRaid_Theme3")
+    {
+        Health("6339");
+    }
+	Health("Volatile_Hive_TowerRaid_Theme4")
+    {
+        Health("7070");
+    }
+	
+	Health("Corruptor_TowerRaid_Theme1")
+    {
+        Health("15582");
+    }
+	Health("Corruptor_TowerRaid_Theme2")
+    {
+        Health("18773");
+    }
+	Health("Corruptor_TowerRaid_Theme3")
+    {
+        Health("22186");
+    }
+	Health("Corruptor_TowerRaid_Theme4")
+    {
+        Health("24746");
+    }
+
+
+	
+	//For Honor
+	
+	Health("FH_Samurai_RGD_1")
+    {
+        //Health("170");
+		//Health("255");
+		Health("340");
+    }
+    Health("FH_Samurai_RGD_2")
+    {
+        //Health("253");
+		//Health("380");
+		Health("506");
+    }
+    Health("FH_Samurai_RGD_3")
+    {
+        //Health("384");
+		//Health("576");
+		Health("768");
+    }
+    Health("FH_Samurai_RGD_4")
+    {
+        //Health("598");
+		//Health("897");
+		Health("1196");
+    }
+    Health("FH_Samurai_RGD_5")
+    {
+        //Health("910");
+		//Health("1365");
+		Health("1820");
+    }
+    Health("FH_Samurai_RGD_6")
+    {
+        //Health("1350");
+		//Health("2025");
+		Health("2700");
+    }
+    Health("FH_Samurai_RGD_7")
+    {
+        //Health("2091");
+		//Health("3136");
+		Health("4182");
+    }
+    Health("FH_Samurai_RGD_8")
+    {
+        //Health("3360");
+		//Health("5040");
+		Health("6720");
+    }
+    Health("FH_Samurai_RGD_9")
+    {
+        //Health("4240");
+		//Health("6360");
+		Health("8480");
+    }
+		
+	Health("FH_Knight_RGD_1")
+    {
+        //Health("170");
+		//Health("255");
+		Health("340");
+    }
+    Health("FH_Knight_RGD_2")
+    {
+        //Health("253");
+		//Health("380");
+		Health("506");
+    }
+    Health("FH_Knight_RGD_3")
+    {
+        //Health("384");
+		//Health("576");
+		Health("768");
+    }
+    Health("FH_Knight_RGD_4")
+    {
+        //Health("598");
+		//Health("897");
+		Health("1196");
+    }
+    Health("FH_Knight_RGD_5")
+    {
+        //Health("910");
+		//Health("1365");
+		Health("1820");
+    }
+    Health("FH_Knight_RGD_6")
+    {
+        //Health("1350");
+		//Health("2025");
+		Health("2700");
+    }
+    Health("FH_Knight_RGD_7")
+    {
+        //Health("2091");
+		//Health("3136");
+		Health("4182");
+    }
+    Health("FH_Knight_RGD_8")
+    {
+        //Health("3360");
+		//Health("5040");
+		Health("6720");
+    }
+    Health("FH_Knight_RGD_9")
+    {
+        //Health("4240");
+		//Health("6360");
+		Health("8480");
+    }
+	
+	Health("FH_Berserker_RGD_1")
+    {
+        //Health("170");
+		//Health("255");
+		Health("306");
+    }
+    Health("FH_Berserker_RGD_2")
+    {
+        //Health("253");
+		//Health("380");
+		Health("455");
+    }
+    Health("FH_Berserker_RGD_3")
+    {
+        //Health("384");
+		//Health("576");
+		Health("692");
+    }
+    Health("FH_Berserker_RGD_4")
+    {
+        //Health("598");
+		//Health("897");
+		Health("1076");
+    }
+    Health("FH_Berserker_RGD_5")
+    {
+        //Health("910");
+		//Health("1365");
+		Health("1638");
+    }
+    Health("FH_Berserker_RGD_6")
+    {
+        //Health("1350");
+		//Health("2025");
+		Health("2430");
+    }
+    Health("FH_Berserker_RGD_7")
+    {
+        //Health("2091");
+		//Health("3136");
+		Health("3764");
+    }
+    Health("FH_Berserker_RGD_8")
+    {
+        //Health("3360");
+		//Health("5040");
+		Health("6048");
+    }
+    Health("FH_Berserker_RGD_9")
+    {
+        //Health("4240");
+		//Health("6360");
+		Health("7632");
+    }
+	Health("Biter_Prologue")
+    {
+        Health("47");
+    }
+	
+	// Vehicles
+	Health("Vehicle_HealthFromCode")
+    {
+		// Used to set specific health on start (we use float factor to scale to MaxHealth)
+		// Also to override health from replication
+		Health("?");
+    }
+	
+	Health("Vehicle_Pickup")
+    {
+		// Seems like a good starting point
+		Health("1150");
+    }
+	
+	Health("Vehicle_Pickup_CTB")
+    {
+		Health("2000");
+    }
+    
+	Health("Harvester_Challenge")
+    {
+		Health("1000000");
+    }
+
+    HealthTotalMul("Vehicle_MulFromCode")
+    {
+        // Used to apply a multiplier to health from code.
+        Health("?");
+    }
+	
+    //DLC_FT
+
+    //Biters
+    Health("Biter_FT_Prologue")
+    {
+        //Health("625-715"); Original one
+        Health("563-653"); //2-3 hits to kill, should survive one power attack
+    }
+
+    Health("Biter_FT_Prologue_beforeWeapon")
+    {
+        Health("478-555"); 
+    }
+    Health("Biter_FT_I")
+    {
+        Health("563-653");
+    }
+    Health("Biter_FT_II")
+    {
+        Health("1020-1200");
+    }
+    Health("Biter_FT_III")
+    {
+        Health("1662-1962");
+    }
+
+    Health("Biter_Armor_FT_I")
+    {
+        Health("704-794");
+    }
+    Health("Biter_Armor_FT_II")
+    {
+        Health("1275-1455");
+    }
+    Health("Biter_Armor_FT_III")
+    {
+        Health("2078-2378");
+    }
+
+    Health("Biter_Weak_FT_I")
+    {
+        Health("255-345");
+    }
+    Health("Biter_Weak_FT_II")
+    {
+        Health("360-540");
+    }
+    Health("Biter_Weak_FT_III")
+    {
+        Health("525-825");
+    }
+
+    Health("Biter_XL_FT_I")
+    {
+        Health("704-794");
+    }
+    Health("Biter_XL_FT_II")
+    {
+        Health("1275-1455");
+    }
+    Health("Biter_XL_FT_III")
+    {
+        Health("2078-2378");
+    }
+
+    Health("Biter_Backpack_FT_I")
+    {
+        Health("563-653");
+    }
+    Health("Biter_Backpack_FT_II")
+    {
+        Health("1020-1200");
+    }
+    Health("Biter_Backpack_FT_III")
+    {
+        Health("1662-1962");
+    }
+
+    Health("Very_special_Biter")
+    {
+        Health("10000");
+    }
+  
+    //Virals
+    Health("Viral_FT_Prologue")
+    {
+        Health("180-210");
+    }
+    Health("Viral_FT_I")
+    {
+        Health("300-390");
+    }
+    Health("Viral_FT_II")
+    {
+        Health("544-724");
+    }
+    Health("Viral_FT_III")
+    {
+        Health("866-1186");
+    }
+    //for a side quest, 50% more HP than a base viral
+    Health("Viral_Strong_FT_I"){   Health("525");  }
+    Health("Viral_Strong_FT_II"){   Health("900");  }
+    Health("Viral_Strong_FT_III"){  Health("1500"); }
+
+    Health("Viral_Chase_FT_I")
+    {
+        Health("300-390");
+    }
+    Health("Viral_Chase_FT_II")
+    {
+        Health("544-724");
+    }
+    Health("Viral_Chase_FT_III")
+    {
+        Health("866-1186");
+    }
+
+    Health("Viral_Weak_FT_I")
+    {
+        Health("100-130");
+    }
+    Health("Viral_Weak_FT_II")
+    {
+        Health("181-241");
+    }
+    Health("Viral_Weak_FT_III")
+    {
+        Health("289-395");
+    }
+
+    //Special Infected
+
+    Health("Spitter_FT_I")
+    {
+        Health("317-407");
+    }
+    Health("Spitter_FT_II")
+    {
+        Health("575-755");
+    }
+    Health("Spitter_FT_III")
+    {
+        Health("937-1237");
+    }
+
+    Health("Suicider_FT_I")
+    {
+        Health("55-145");
+    }
+    Health("Suicider_FT_II")
+    {
+        Health("60-240");
+    }
+    Health("Suicider_FT_III")
+    {
+        Health("75-375");
+    }
+
+    Health("Screamer_FT_I")
+    {
+        Health("317-407");
+    }
+    Health("Screamer_FT_II")
+    {
+        Health("575-755");
+    }
+    Health("Screamer_FT_III")
+    {
+        Health("937-1237");
+    }
+    
+    Health("Bolter_FT_I")
+    {
+        Health("317-407");
+    }
+    Health("Bolter_FT_II")
+    {
+        Health("575-755");
+    }
+    Health("Bolter_FT_III")
+    {
+        Health("937-1237");
+    }
+
+    Health("Banshee_FT_I")
+    {
+        Health("423-513");
+    }
+    Health("Banshee_FT_II")
+    {
+        Health("766-946");
+    }
+    Health("Banshee_FT_III")
+    {
+        Health("1249-1549");
+    }
+
+
+    Health("Banshee_Weak_FT_I")
+    {
+        Health("333-423");
+    }
+    Health("Banshee_Weak_FT_II")
+    {
+        Health("574-709");
+    }
+    Health("Banshee_Weak_FT_III")
+    {
+        Health("936-1161");
+    }
+
+    Health("Hag_FT_I")
+    {
+        Health("905-995");
+    }
+    Health("Hag_FT_II")
+    {
+        Health("1532-1892");
+    }
+    Health("Hag_FT_III")
+    {
+        Health("2498-3098");
+    }
+
+    Health("Charger_FT_I")
+    {
+        Health("529-619");
+    }
+    Health("Charger_FT_II")
+    {
+        Health("958-1138");
+    }
+    Health("Charger_FT_III")
+    {
+        Health("1561-1861");
+    }
+
+    Health("Volatile_FT_I")
+    {
+        Health("2146-2236");
+    }
+    Health("Volatile_FT_II")
+    {
+        Health("4852-5432");
+    }
+    Health("Volatile_FT_III")
+    {
+        Health("9905-13205");
+    }
+    
+    Health("Volatile_Apex_FT_I") //10% more then Volatile
+    {
+        Health("2360-2460");
+    }
+    Health("Volatile_Apex_FT_II")
+    {
+        Health("5337-5975");
+    }
+    Health("Volatile_Apex_FT_III")
+    {
+        Health("10896-14526");
+    }
+
+    Health("Volatile_Hive_FT_I")
+    {
+        //Health("715-745");
+        Health("550"); //1100/2
+    }
+    Health("Volatile_Hive_FT_II")
+    {
+        //Health("1249-1309");
+        Health("975"); //1950/2
+    }
+    Health("Volatile_Hive_FT_III")
+    {
+        //Health("1952-2052");
+        Health("1500"); //3000/2
+    }
+    
+    Health("Volatile_Tyrant_FT_I")
+    {
+        Health("3005-3131");
+    }
+    Health("Volatile_Tyrant_FT_II")
+    {
+        Health("7278-8148");
+    }
+    Health("Volatile_Tyrant_FT_III")
+    {
+        Health("15848-16328");
+    }
+
+    //Boss Infected
+
+    Health("Goon_FT_I")
+    {
+        Health("2245-2335");
+    }
+    Health("Goon_FT_II")
+    {
+        Health("5060-5640");
+    }
+    Health("Goon_FT_III")
+    {
+        Health("8750-11050");
+    }
+    
+    Health("Goon_FT_week_II")
+    {
+        Health("2030-2120");
+    }
+
+    Health("Demolisher_FT_I")
+    {
+        Health("2655-2745");
+    }
+    Health("Demolisher_FT_II")
+    {
+        Health("5980-6560");
+    }
+    Health("Demolisher_FT_III")
+    {
+        Health("10450-12750");
+    }
+
+    Health("Demolisher_Gorilla_FT_I")
+    {
+        Health("2755-2845");
+    }
+    Health("Demolisher_Gorilla_FT_II")
+    {
+        Health("5980-6560");
+    }
+    Health("Demolisher_Gorilla_FT_III")
+    {
+        Health("10450-12750");
+    }
+
+    Health("Corruptor_FT_I")
+    {
+        Health("6735-7825");
+    }
+    Health("Corruptor_FT_II")
+    {
+        Health("12180-13760");
+    }
+    Health("Corruptor_FT_III")
+    {
+        Health("27050-29550");
+    }
+
+    //Freaks
+
+    Health("Freak_Behemoth_Level_1")
+    {
+        Health("9232");
+    }
+    Health("Freak_Behemoth_Level_4")
+    {
+        Health("10640");
+    }
+    Health("Freak_Behemoth_Level_7")
+    {
+        Health("24320");
+    }
+    Health("Freak_Behemoth_Quest")
+    {
+        Health("7216");
+    }
+        Health("Freak_Behemoth_Quest_Castle")
+    {
+        Health("14432");
+    }
+    Health("Freak_Behemoth_IGN_Easy")
+    {
+        Health("7980");
+    }
+    Health("Freak_Gorilla_Level_1")
+    {
+        Health("3500");
+    }
+    Health("Freak_Gorilla_Level_4")
+    {
+        Health("7500");
+    }
+    Health("Freak_Gorilla_Level_7")
+    {
+        Health("16000");
+    }
+
+    Health("Freak_Torch_Level_1")
+    {
+        Health("5000");
+    }
+    Health("Freak_Torch_Level_4")
+    {
+        Health("9500");
+    }
+    Health("Freak_Torch_Level_7")
+    {
+        Health("21000");
+    }
+
+    Health("Freak_Monkey_I")
+    {
+        Health("1200");
+    }
+    Health("Freak_Monkey_II")
+    {
+        Health("5000");
+    }
+    Health("Freak_Monkey_III")
+    {
+        Health("15000");
+    }
+
+    Health("Freak_Superman_Level_1")
+    {
+        Health("37390");
+    }
+    Health("Freak_Superman_Level_4")
+    {
+        Health("49303");
+    }
+    Health("Freak_Superman_Level_7")
+    {
+        Health("70592");
+    }
+
+    Health("Freak_Slasher_Level_1")
+    {
+        Health("4845");
+    }
+    Health("Freak_Slasher_Level_4")
+    {
+        Health("9044");
+    }
+    Health("Freak_Slasher_Level_7")
+    {
+        Health("15504");
+    }
+
+    Health("Freak_Slasher_skillet_01_Level_1")
+    {
+        Health("3150");
+    }
+    Health("Freak_Slasher_skillet_01_Level_4")
+    {
+        Health("5934");
+    }
+    Health("Freak_Slasher_skillet_01_Level_7")
+    {
+        Health("10174");
+    }
+
+    Health("Freak_Slasher_Biter")
+    {
+        Health("250");
+    }
+
+    Health("Freak_Matriarch_Level_1")
+    {
+        Health("5000");
+    }
+    Health("Freak_Matriarch_Level_4")
+    {
+        Health("12000");
+    }
+    Health("Freak_Matriarch_Level_7")
+    {
+        Health("24000");
+    }
+    Health("Freak_Matriarch_Daughter_Level_1")
+    {
+        Health("165");
+    }
+    Health("Freak_Matriarch_Daughter_Level_4")
+    {
+        Health("350");
+    }
+    Health("Freak_Matriarch_Daughter_Level_7")
+    {
+        Health("950");
+    }
+
+    Health("Freak_Karen_Level_1")
+    {
+        Health("6000");
+    }
+    Health("Freak_Karen_Level_4")
+    {
+        Health("10000");
+    }
+    Health("Freak_Karen_Level_7")
+    {
+        Health("20000");
+    }
+
+    Health("Freak_Hologram_Level_1")
+    {
+        Health("6510");
+    }
+    Health("Freak_Hologram_Level_4")
+    {
+        Health("11812");
+    }
+    Health("Freak_Hologram_Level_7")
+    {
+        Health("21525");
+    }
+
+    Health("Freak_Groot_I")
+    {
+        Health("1500");
+    }
+    Health("Freak_Groot_II")
+    {
+        Health("12000");
+    }
+    Health("Freak_Groot_III")
+    {
+        Health("22000");
+    }
+
+    Health("Freak_Nemo_I")
+    {
+        Health("12540");
+    }
+    Health("Freak_Nemo_II")
+    {
+        Health("12540");
+    }
+    Health("Freak_Nemo_III")
+    {
+        Health("12540");
+    }
+    
+    //Human Enemies
+
+    Health("Survivor_FT_I")
+    {
+        Health("653");
+    }
+    Health("Survivor_FT_II")
+    {
+        Health("1200");
+    }
+    Health("Survivor_FT_III")
+    {
+        Health("1962");
+    }
+    Health("Survivor_Prisoner_FT_I")
+    {
+        Health("653");
+        //Health("486"); //608, 1h -20%
+    }
+    Health("Survivor_Prisoner_FT_II")
+    {
+        Health("1200");
+        //Health("888"); //1110, 1h -20%
+    }
+    Health("Survivor_Prisoner_FT_III")
+    {
+        Health("1962");
+        //Health("1450"); //1812, 1h -20%
+    }
+    Health("Survivor_Beggar_FT_I")
+    {
+        Health("206"); //608, 1h -50%
+    }
+    Health("Survivor_Beggar_FT_II")
+    {
+        Health("377"); //1110, 1h -50%
+    }
+    Health("Survivor_Beggar_FT_III")
+    {
+        Health("616"); //1812, 1h -50%
+    }
+
+    Health("OneHanded_FT_I")
+    {
+        Health("563-653");
+    }
+    Health("OneHanded_FT_II")
+    {
+        Health("1020-1200");
+    }
+    Health("OneHanded_FT_III")
+    {
+        Health("1662-1962");
+    }
+    
+    Health("TwoHanded_FT_I")
+    {
+        Health("1095-1185");
+    }
+    Health("TwoHanded_FT_II")
+    {
+        Health("1983-2163");
+    }
+    Health("TwoHanded_FT_III")
+    {
+        Health("3232-3532");
+    }
+    
+    Health("Archer_FT_I")
+    {
+        Health("405-495");
+    }
+    Health("Archer_FT_II")
+    {
+        Health("733-913");
+    }
+    Health("Archer_FT_III")
+    {
+        Health("1195-1495");
+    }
+    
+    Health("Spearman_FT_I")
+    {
+        Health("563-653");
+    }
+    Health("Spearman_FT_II")
+    {
+        Health("858-1038");
+    }
+    Health("Spearman_FT_III")
+    {
+        Health("1274-1574");
+    }
+    
+    Health("Human_Rifleman_FT_I")
+    {
+        Health("405-495");
+    }
+    Health("Human_Rifleman_FT_II")
+    {
+        Health("733-913");
+    }
+    Health("Human_Rifleman_FT_III")
+    {
+        Health("1195-1495");
+    }
+
+    Health("Human_Shotguner_FT_I")
+    {
+        Health("645-735");
+    }
+    Health("Human_Shotguner_FT_II")
+    {
+        Health("1140-1446");
+    }
+    Health("Human_Shotguner_FT_III")
+    {
+        Health("2066-2366");
+    }
+    
+    //Quest Specific
+
+    Health("Aiden_Beast_I")
+    {
+        Health("19000");
+    }
+    Health("Aiden_Beast_II")
+    {
+        Health("19000");
+    }
+    Health("Aiden_Beast_II_InitialHP")
+    {
+        Health("60% of MaxHealth");
+    }
+    
+    Health("dlc_ft_sq_15_BabaYaga_FT_I")
+    {
+        Health("1500");
+    }
+    Health("dlc_ft_sq_15_BabaYaga_FT_II")
+    {
+        Health("3500");
+    }
+    Health("dlc_ft_sq_15_BabaYaga_FT_III")
+    {
+        Health("5500");
+    }
+    
+    Health("Baron_Boss_I")
+    {
+        Health("9795");
+    }
+    Health("Baron_Boss_II")
+    {
+        Health("9795");
+    }
+    Health("Baron_Boss_II_InitialHP")
+    {
+        Health("70% of MaxHealth");
+    }
+    Health("Baron_Boss_III") // TO BE DELETED
+    {
+        Health("18000");
+    }
+    Health("Baron_Boss_III_InitialHP") // TO BE DELETED
+    {
+        Health("30% of MaxHealth");
+    }
+    Health("Beast")
+    {
+        Health("18000");
+    }
+    Health("dlc_ft_Corruptor_SQ")
+    {
+        Health("3500");
+    }
+
+    Health("Baron_Men_Beast_Prototype")
+    {
+        Health("1400");
+    }
+
+    Health("Biter_Hanged")
+    {
+        Health("10");
+    }
+
+    Health("dlc_ft_sq_36_lieutenant_I")
+    {
+        Health("7835");
+    }
+
+    Health("dlc_ft_sq_36_lieutenant_II")
+    {
+        Health("7836");
+    }
+
+    Health("dlc_ft_sq_36_lieutenant_III")
+    {
+        Health("7837");
+    }
+
+    Health("dlc_ft_sq_36_grenadier_I")
+    {
+        Health("4150");
+    }
+
+    Health("dlc_ft_sq_36_grenadier_II")
+    {
+        Health("4151");
+    }
+    
+    Health("dlc_ft_sq_36_grenadier_III")
+    {
+        Health("4152");
+    }
+
+    HealthTotalMul("MaxHealthHungerMul")
+    {
+        Health("?");
+    }
+}

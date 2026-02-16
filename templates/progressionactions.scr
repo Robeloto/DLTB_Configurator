@@ -1,0 +1,267 @@
+// Actions
+sub main()
+{   
+	LegendBonus_Difficulty("Easy", 1.0); //bonus for diffculty level
+	LegendBonus_Difficulty("Normal", 1.0);
+	LegendBonus_Difficulty("Hard", 1.05);
+	LegendBonus_Difficulty("Nightmare", 1.15);
+	
+	LegendPoints_PenaltyTreshold(0); //after this level player will losse xp upon death
+	
+    // If LegendBonus_Penalty is greater than 0 then it's applied.
+    // It's applied to final calculations and works same as regular xp penalties.
+    // Meaning following player variables are taken into account:
+    // * LLDeathPenaltyXpLossPercentage.
+    // * LLDeathPenaltyXpLossMultiplierDay/Night.
+    // F.e. if you want increase final xp penalty by 10%, the value should be 1.1.
+    // If you want to reduce final xp penalty by 90%, the value should be 0.1.
+	LegendBonus_Penalty("Easy", 1.05);
+	LegendBonus_Penalty("Normal", 1.1);
+	LegendBonus_Penalty("Hard", 1.2);
+	LegendBonus_Penalty("VeryHard", 1.25);
+	LegendBonus_Penalty("Nightmare", 1.33);
+	LegendBonus_Penalty("Deadly", 0.0);
+	
+	LegendBonus_Coop(2, 1.0); //bonus for coop
+	LegendBonus_Coop(3, 1.0);
+	LegendBonus_Coop(4, 1.0);
+
+	LegendBonus_NGPlus(1.5);
+	
+	LegendPoints_Quest(1.0); //% of quest XP reward converted to LP
+	LegendPoint_Quest_Category("ReplayableGREAnomaly", 1.0); //% of quest XP reward converted to LP for specific quest category (see StoryQuestCategory.h)
+	
+	//LegendTitle(min, max, text, icon, color)
+	LegendTitle(0, 24, 		"&LegendName_Bronze&", 		"LegendLevel_crest_player_bronze_01", "xp_legend_tier_1");
+    LegendTitle(25, 49, 	"&LegendName_Bronze25&", 	"LegendLevel_crest_player_bronze_02", "xp_legend_tier_1");
+    LegendTitle(50, 74, 	"&LegendName_Bronze50&", 	"LegendLevel_crest_player_bronze_03", "xp_legend_tier_1");
+    LegendTitle(75, 99, 	"&LegendName_Silver&", 		"LegendLevel_crest_player_silver_01", "xp_legend_tier_2");
+    LegendTitle(100, 124, 	"&LegendName_Silver100&", 	"LegendLevel_crest_player_silver_02", "xp_legend_tier_2");
+    LegendTitle(125, 149, 	"&LegendName_Silver125&", 	"LegendLevel_crest_player_silver_03", "xp_legend_tier_2");
+    LegendTitle(150, 174, 	"&LegendName_Gold&", 		"LegendLevel_crest_player_gold_01",   "xp_legend_tier_3");
+    LegendTitle(175, 199, 	"&LegendName_Gold175&", 	"LegendLevel_crest_player_gold_02",   "xp_legend_tier_3");
+    LegendTitle(200, 224, 	"&LegendName_Gold200&", 	"LegendLevel_crest_player_gold_03",   "xp_legend_tier_3");
+    LegendTitle(225, 249, 	"&LegendName_Platinum&", 	"LegendLevel_crest_player_platinum_01",   "xp_legend_color_platinum" );
+    LegendTitle(250, 274, 	"&LegendName_Platinum250&", "LegendLevel_crest_player_platinum_02",   "xp_legend_color_platinum" );
+    LegendTitle(275, 299, 	"&LegendName_Platinum275&", "LegendLevel_crest_player_platinum_03",   "xp_legend_color_platinum" );
+    LegendTitle(300, 1000, 	"&LegendName_Platinum300&", "LegendLevel_crest_player_platinum_04",   "xp_legend_color_platinum" );
+	
+	LegendTier(0, 74, "&LegendLevel_Tooltip_Bronze&", "xp_legend_tier_1");
+	LegendTier(75, 149, "&LegendLevel_Tooltip_Silver&", "xp_legend_tier_2");
+	LegendTier(150, 224, "&LegendLevel_Tooltip_Gold&", "xp_legend_tier_3");
+	LegendTier(225, 1000, "&LegendName_Complete&", "xp_legend_color_platinum");
+
+    // Combat Actions ///////////////////////////////////////////
+    
+    // Action("DamageDealt", Experience, 1) { LP(1); }   
+    //Action("Block", Experience, 1) { LP(1); }
+	Action("AI_Killed", Experience, 25) { LP(1.0); }   	// Values for this are definied in humanai.pre "XpForKill" and will overwrite this value but the action still needs to be defined
+    Action("AI_KillAssist", Experience, 15) { LP(1.0); }	// Used when player damaged AI, but someone else got the kill      
+	//Action("Mutilate", Experience, 6) { LP(0.25); }                 
+    //Action("CombatSkill", Experience, 20) { LP(0.25); } 	// Tackle, Push
+    //Action("JumpAttack", Experience, 3); 		// Dropkick
+    //Action("RegularKickHit", Experience, 1) { LP(1); }
+	//Action("ChargedKick", Experience, 3);
+	//Action("VaultKick", Experience, 2);
+	//Action("DropKick", Experience, 2);
+	Action("EnemyJump", Experience, 5) { LP(1.0); } 
+	Action("GrappleThrow", Experience, 5) { LP(1.0); } 
+	//Action("Bash", Experience, 2);
+	//Action("Windmill", Experience, 5);
+	//Action("ParkourShot", Experience, 5);
+	//Action("PowerShot", Experience, 3);
+    //Action("PerfectBlock", Experience, 3) { LP(1); }
+	Action("DEBUG_Combat", Experience, 0) { LP(1.0); } 
+	Action("DEBUG_CombatBigGain", Experience, 0) { LP(1.0); HudBigGain(); }
+    //Action("NightBonusCombat", Experience, 1) { LP(0.1); }
+    //Action("Finisher", Experience, 3) { LP(0.25); }
+    
+	// Add Enviro Kill
+    
+    // Parkour Actions//////////////////////////////////////////
+	
+	// Actions for jumps can be defined in the jump_parameters.scr
+	// Actions for custom moves can be defined in the custom_moves.scr
+
+	//Action("LargeJump", Experience, 1){ LP(1); } // Jumps over a lot of free space with enough air time (controlled by xp_runner_air curve) 
+	//Action("LargeJumpToHang", Experience, 1) { LP(1); } // Jumps over a lot of free space with enough air time (controlled by xp_runner_air curve) and "lands" by grabing the ledge
+	
+	//Action("VeryLargeJump", Experience, 2) { LP(0.5); } // Jumps over a lot of free space with enough air time (controlled by xp_runner_air curve) 
+	//Action("VeryLargeJumpToHang", Experience, 2) { LP(0.5); } // Jumps over a lot of free space with enough air time (controlled by xp_runner_air curve) and "lands" by grabing the ledge
+	//Action("Shimmy", Experience, 1) { LP(1); } // Any shimmy
+	//Action("LadderClimb", Experience, 1) { LP(1); } // Climbing on a ladder
+	//Action("JumpOnLow", Experience, 1) { LP(1); } // Jump on a low obstacle
+	//Action("Climb", Experience, 1) { LP(1); } // Climb (from edge grab)
+    //Action("ZipLineSlide", Experience, 1) { LP(0.5); } // Added at the end of zip line slide
+    //Action("Slide", Experience, 2) { LP(0.25); } // Slide under something
+    Action("ActiveLanding", Experience, 5) // Active landing performed (amortized landing)
+    { 
+        LP(1.0);
+        AntyExploitByTime();
+    }
+    Action("LargeActiveLanding", Experience, 5) // Active landing performed (amortized landing)
+    {
+        LP(1.0); 
+        AntyExploitByTime();
+    }
+	Action("FarJump", Experience, 5) { LP(1.0); }
+	Action("DoubleJump", Experience, 5) { LP(1.0); }
+	//Action("ActiveLandingJump", Experience, 2) { LP(0.25); }	
+	//Action("JumpBelow", Experience, 3) { LP(0.25); }		
+	//Action("WallRunJump", Experience, 2) { LP(0.25); }
+	//Action("GenericCustomMove", Experience, 1) { LP(0.5); } // Any custom move that does not have its own action defined
+	//Action("CM_HoleInTheWall", Experience, 1) { LP(0.5); }
+	//Action("CM_DoorSkylight", Experience, 1) { LP(0.5); }
+	//Action("CM_UnderRail", Experience, 1) { LP(0.5); }
+	//Action("CM_PipeSlide", Experience, 1) { LP(0.5); }
+	//Action("CM_TreeAmortizer", Experience, 1) { LP(0.5); }
+	//Action("Glide", Experience, 20) { LP(0.25); } // Gliding on a wall longer than the height specified in MinGlideHeightToAwardExperience player variable
+	//Action("MonkeyBarGrab", Experience, 1) { LP(1); }
+	//Action("RopeGrab", Experience, 1) { LP(1); }
+	//Action("RopeHook", Experience, 1) { LP(0.25); }
+	//Action("WallRunSide", Experience, 1) { LP(0.25); }
+	//Action("Afterboost", Experience, 1) { LP(0.25); }
+    //Action("KnifeSlide", Experience, 3) { LP(0.25); }
+	
+	//Action("EdgeGrab", Experience, 1) { LP(1); }
+	Action("DEBUG_Traversal", Experience, 0) { LP(1.0); }
+	//Action("NightBonusTraversal", Experience, 1) { LP(0.1); }	
+	//Action("NightBonusLP", LegendPoints, 0) { LP(0.0); } //special action to pass NightBonus Legend Points
+    //Action("WallRunFront", Experience, 15) { LP(0.25); }
+	
+    
+    //Action("ItemPickedUp", Experience, 1) { LP(1); }
+    
+    //Action("Takedown", Experience, 3) { LP(0.25); }
+    //Action("TakedownSilent", Experience, 3) { LP(0.25); }
+    //Action("TakedownHanging", Experience, 3) { LP(0.25); }
+    //Action("DeathFromAbove", Experience, 3) { LP(0.25); }
+    //Action("DeathFromAboveSilent", Experience, 0) { LP(0.25); }
+
+    // Other Actions //////////////////////////////////////////
+    
+    Action("LockPicked", Experience, 50) { LP(1.0); }
+	Action("PursuitLost", Experience, 50) { LP(1.0); }
+    Action("PursuitFinished", Experience, 50) { LP(1.0); }
+    Action("NightSurvived", Experience, 500) { LP(1.0); }
+	Action("MapZone", Experience, 250) { LP(1.0); } 
+	
+	Action("CollectableItem", Experience, 25) { LP(1.0); }
+	Action("CoopHeal", Experience, 25) { LP(1.0); }
+	Action("CoopRevive", Experience, 100) { LP(1.0); }
+	Action("CoopDistressHelp", Experience, 50) { LP(1.0); }
+	
+	Action("NightBonusExperience", Experience, 1) { LP(1.0); }	//xp amount is set from code
+	
+	// Encounter Actions //////////////////////////////////////////  
+    Action("CampEncounterSuccess", World, 750) { LP(1.0); }    
+
+	Action("ParkourChallenge_Easy", Experience, 750) { LP(1.0); }
+	Action("ParkourChallenge_Medium", Experience, 1000) { LP(1.0); }
+	Action("ParkourChallenge_Hard", Experience, 1500) { LP(1.0); }
+
+	Action("CombatChallenge_Easy", Experience, 750) { LP(1.0); }
+	Action("CombatChallenge_Medium", Experience, 1000) { LP(1.0); }
+	Action("CombatChallenge_Hard", Experience, 1500) { LP(1.0); }
+	
+	Action("ParkourChallenge_Diff1_Bronze", Experience, 150) { LP(1.0); }
+	Action("ParkourChallenge_Diff1_Silver", Experience, 250) { LP(1); }
+	Action("ParkourChallenge_Diff1_Gold", Experience, 500) { LP(1.0); }
+	Action("ParkourChallenge_Diff1_Platinum", Experience, 1000) { LP(1.0); }	
+	Action("ParkourChallenge_Diff2_Bronze", Experience, 250) { LP(1.0); }
+	Action("ParkourChallenge_Diff2_Silver", Experience, 500) { LP(1); }
+	Action("ParkourChallenge_Diff2_Gold", Experience, 1000) { LP(1.0); }
+	Action("ParkourChallenge_Diff2_Platinum", Experience, 1500) { LP(1.0); }		
+	Action("ParkourChallenge_Diff3_Bronze", Experience, 250) { LP(1.0); }
+	Action("ParkourChallenge_Diff3_Silver", Experience, 500) { LP(1); }
+	Action("ParkourChallenge_Diff3_Gold", Experience, 1000) { LP(1.0); }
+	Action("ParkourChallenge_Diff3_Platinum", Experience, 2000) { LP(1.0); }	
+	Action("ParkourChallenge_Diff4_Bronze", Experience, 325) { LP(1.0); }
+	Action("ParkourChallenge_Diff4_Silver", Experience, 625) { LP(1); }
+	Action("ParkourChallenge_Diff4_Gold", Experience, 1250) { LP(1.0); }
+	Action("ParkourChallenge_Diff4_Platinum", Experience, 2500) { LP(1.0); }	
+	Action("ParkourChallenge_Diff5_Bronze", Experience, 375) { LP(1.0); }
+	Action("ParkourChallenge_Diff5_Silver", Experience, 750) { LP(1); }
+	Action("ParkourChallenge_Diff5_Gold", Experience, 1500) { LP(1.0); }
+	Action("ParkourChallenge_Diff5_Platinum", Experience, 3000) { LP(1.0); }	
+	Action("ParkourChallenge_Diff6_Bronze", Experience, 425) { LP(1.0); }
+	Action("ParkourChallenge_Diff6_Silver", Experience, 875) { LP(1); }
+	Action("ParkourChallenge_Diff6_Gold", Experience, 1750) { LP(1.0); }
+	Action("ParkourChallenge_Diff6_Platinum", Experience, 3500) { LP(1.0); }	
+
+	Action("CombatChallenge_Diff1_Bronze", Experience, 150) { LP(1.0); }
+	Action("CombatChallenge_Diff1_Silver", Experience, 250) { LP(1.0); }
+	Action("CombatChallenge_Diff1_Gold", Experience, 500) { LP(1.0); }
+	Action("CombatChallenge_Diff2_Bronze", Experience, 200) { LP(1.0); }
+	Action("CombatChallenge_Diff2_Silver", Experience, 375) { LP(1); }
+	Action("CombatChallenge_Diff2_Gold", Experience, 750) { LP(1.0); }
+	Action("CombatChallenge_Diff3_Bronze", Experience, 250) { LP(1.0); }
+	Action("CombatChallenge_Diff3_Silver", Experience, 500) { LP(1.0); }
+	Action("CombatChallenge_Diff3_Gold", Experience, 1000) { LP(1.0); }
+	Action("CombatChallenge_Diff4_Bronze", Experience, 325) { LP(1.0); }
+	Action("CombatChallenge_Diff4_Silver", Experience, 625) { LP(1.0); }
+	Action("CombatChallenge_Diff4_Gold", Experience, 1250) { LP(1.0); }
+	Action("CombatChallenge_Diff5_Bronze", Experience, 375) { LP(1.0); }
+	Action("CombatChallenge_Diff5_Silver", Experience, 750) { LP(1.0); }
+	Action("CombatChallenge_Diff5_Gold", Experience, 1500) { LP(1.0); }
+	Action("CombatChallenge_Diff6_Bronze", Experience, 425) { LP(1.0); }
+	Action("CombatChallenge_Diff6_Silver", Experience, 875) { LP(1); }
+	Action("CombatChallenge_Diff6_Gold", Experience, 1750) { LP(1.0); }
+	
+	//Dynamic Challenges /////////////////////////////////////////
+	Action("DynamicChallenge_Race_1", Experience, 500) { LP(1); }
+	Action("DynamicChallenge_Race_2", Experience, 250) { LP(1); }
+	Action("DynamicChallenge_Race_3", Experience, 100) { LP(1); }
+	Action("DynamicChallenge_Race_4", Experience, 50) { LP(1); }
+	
+	Action("DynamicChallenge_Combat_1", Experience, 500) { LP(1); }
+	Action("DynamicChallenge_Combat_2", Experience, 250) { LP(1); }
+	Action("DynamicChallenge_Combat_3", Experience, 100) { LP(1); }
+	Action("DynamicChallenge_Combat_4", Experience, 50) { LP(1); }
+	
+    
+	Action("InhibitorCollected", Inhibitors, 1) { LP(1); }
+	
+	Action("FuryPointCollected", FuryPoints, 1) { LP(0); }
+
+	Action("EncounterSuccessSmallReward")
+    {
+        AddPoints(Experience, 250);
+        AddPoints(Experience, 250);
+		LP(0.75);
+		HudBigGain();
+    }
+
+    Action("EncounterSuccess")
+    {
+        AddPoints(Experience, 250);
+        AddPoints(Experience, 250);
+		LP(0.75);
+		HudBigGain();
+    }
+	
+	Action("PrisonerNPCSaved")
+    {
+        AddPoints(Experience, 250);
+        AddPoints(Experience, 250);
+		LP(0.75);
+		HudBigGain();
+    }
+	
+    NightCategory("Runner")
+    {
+        Action("PursuitLost");
+    }
+    
+    NightCategory("Killer")
+    {
+        Action("AI_Killed");
+        Action("AI_KillAssist");
+    }
+    
+    NightCategory("Looter")
+    {
+        Action("LockPicked");
+        Action("ItemPickedUp");
+    }
+}

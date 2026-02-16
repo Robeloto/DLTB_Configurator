@@ -1,0 +1,1417 @@
+// Densities are defined in such way that min value is exclusive and max value is inclusive
+// e.g. level Easy with number of AIs between 1 and 3 should be defined as Easy(0, 3);
+// You can also specify density in percentage, e.g. Medium("40-60%"); which means AIs will
+// be spawned in 40 to 60% of available points.
+
+export int Day = 0;
+export int Night = 1;
+
+sub ZeroDensity()
+{
+    None(0, 0);
+    RunThrough(0, 0);
+    Easy(0, 0);
+    Medium(0, 0);
+    Hard(0, 0);
+    VeryHard(0, 0);
+    OWA(0, 0);	
+    HUB(0, 0);		
+    Park(0, 0);
+    Outpost(0, 0);
+    Industrial(0, 0);
+}
+
+sub TurnOffTagForDynamicSpawner(string tag="")
+{
+    DensitiesTagged(Day, tag)
+    {
+        use ZeroDensity();
+    }
+    
+    DensitiesTagged(Night, tag)
+    {
+        use ZeroDensity();
+    }
+}
+
+sub main()
+{
+    // Non-tagged densities are defined by group size, radius and distance between
+    /*Densities(Day)
+    {
+        None(0, 0);
+		RunThrough(8, 10);
+        Easy(14, 16);
+        Medium(14, 16);
+        VeryHard(85, 90);
+		
+		OWA(4, 6);
+    }
+    
+    Densities(Night)
+    {
+        None(0, 0);
+		RunThrough(10, 12);
+        Easy(35, 40); 
+        Medium(50, 55); 
+        Hard(90, 95); 
+        VeryHard(100, 110);
+		
+		OWA(10, 12);
+    }*/
+    
+    // no zombies on rooftops during the day
+    DensitiesTagged(Day, "rooftop")
+    {
+        None(0, 0);
+		RunThrough(0, 0);
+        Easy(1, 2);
+        Medium(2, 3);
+        Hard(3, 4);
+        VeryHard(4, 4);
+		
+		OWA(1, 2);
+    }
+    
+    DensitiesTagged(Night, "rooftop")
+    {
+        // TODO: change it to work as earlier
+        None(0, 0);
+		RunThrough(0, 0);
+        Easy(3, 6);
+        Medium(5, 8);
+        Hard(7, 10);
+        VeryHard(9, 10);
+		
+		OWA(4, 6);
+    }
+	
+    // animations zombies on city
+    DensitiesTagged(Day, "init_ground") // e.g. Bangin Door.
+    {
+        None("0%");
+		RunThrough("25%");
+        Easy("25%");
+        Medium("25%");
+        Hard("25%");
+        VeryHard("25%");
+		
+		HUB("25%");
+		OWA("25%");
+		Park("25%");	
+		
+		Industrial("60%");
+        CC_Medium("100%");
+    }
+    
+    DensitiesTagged(Night, "init_ground")
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");		
+		
+		Industrial("60%");
+		CC_Medium("100%");
+    }
+	
+    DensitiesTagged(Day, "init_ground_flavor") // Biter One Shot spawns in BP and won't leave it.
+    {
+        None(0, 0);
+		RunThrough(0, 0);
+        Easy(0, 0);
+        Medium(0, 0);
+        Hard(0, 0);
+        VeryHard(0, 0);
+		
+		HUB(0, 0);
+		OWA(0, 0);
+		Park(0, 0);		
+    }
+	
+    DensitiesTagged(Night, "init_ground_flavor") // Biter One Shot spawns in BP and won't leave it.
+    {
+        None(0, 0);
+		RunThrough(0, 0);
+        Easy(0, 0);
+        Medium(0, 0);
+        Hard(0, 0);
+        VeryHard(0, 0);
+		
+		HUB(0, 0);
+		OWA(0, 0);
+		Park(0, 0);		
+    }
+	
+    DensitiesTagged(Day, "init_ground_flavor_pinned_down") // Biter Grounded/Pinned down by something.
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");		
+		
+		Industrial("60%");
+    }
+	
+    DensitiesTagged(Night, "init_ground_flavor_pinned_down") // Biter Grounded/Pinned down by something.
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");	
+		
+		Industrial("60%");	
+    }
+	
+    DensitiesTagged(Day, "init_ground_flavor_reach_hand") // Biter Reaching his hand mostly used in basements
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");
+		
+		Industrial("60%");
+    }
+	
+    DensitiesTagged(Night, "init_ground_flavor_reach_hand") // Biter Reaching his hand mostly used in basements
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");
+		
+		Industrial("60%");
+    }
+	
+    DensitiesTagged(Day, "init_ground_flavor_spiked") // Biter Barrel
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");
+		
+		Industrial("60%");
+    }
+	
+    DensitiesTagged(Night, "init_ground_flavor_spiked") 
+    {
+        None("0%");
+		RunThrough("0%");
+        Easy("0%");
+        Medium("0%");
+        Hard("0%");
+        VeryHard("0%");
+		
+		HUB("0%");
+		OWA("0%");
+		Park("0%");
+		
+		Industrial("60%");
+    }
+    
+    GroupsTagged(Day, "Standing_Reach")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }                                                      
+	
+    GroupsTagged(Night, "Standing_Reach") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+    
+    GroupsTagged(Day, "Jumping_Reach")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "Jumping_Reach") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+    
+    GroupsTagged(Day, "Pinned_Down")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "Pinned_Down") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+    
+    GroupsTagged(Day, "Breaking_Door")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "Breaking_Door") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+    
+    GroupsTagged(Day, "Shamble")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "Shamble") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+    
+    GroupsTagged(Day, "Lying")
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "Lying") 
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+
+    //
+    
+    GroupsTagged(Day, "LyingByObject") // Under Something
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+	
+    GroupsTagged(Night, "LyingByObject") // Under Something
+    {
+        Urban_Sparse()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Moderate()    { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Dense()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Urban_Packed()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        Wild_Sparse()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Moderate()     { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Dense()        { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        Wild_Packed()       { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+                                                           
+        CC_Benchmark()      { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Light()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+        CC_Density_Heavy()  { Group(1, 1); Radius(0.5, 1); DistanceBetween(25.0); DistanceBetweenAlone(30.0); }
+    }
+    
+    //
+	
+    use TurnOffTagForDynamicSpawner(tag="init_ground_flavor");
+    use TurnOffTagForDynamicSpawner(tag="bandit_camp");
+    use TurnOffTagForDynamicSpawner(tag="corruptor");
+    use TurnOffTagForDynamicSpawner(tag="roof_init_flap");
+    use TurnOffTagForDynamicSpawner(tag="roof_init_vent_shaft");
+    use TurnOffTagForDynamicSpawner(tag="bandit_camp_door");
+	
+    /////////////////////////////////////////////////////////////
+    // 
+	// DLC 2 FRONTIER - Dynamic Spawn Points
+	//
+    /////////////////////////////////////////////////////////////
+	
+    DensitiesTagged(Day, "dlc_ft_ind_range") //Spitter test
+    {
+		Urban_Dense("100%");
+        None("100%");
+		RunThrough("100%");
+        Easy("100%");
+        Medium("100%");
+        Hard("100%");
+        VeryHard("100%");
+		
+        Industrial("100%");
+    }
+    DensitiesTagged(Night, "dlc_ft_ind_range") // Biter Barrel
+    {
+        Urban_Dense("100%");
+        None("100%");
+		RunThrough("100%");
+        Easy("100%");
+        Medium("100%");
+        Hard("100%");
+        VeryHard("100%");
+		
+        Industrial("100%");
+    }
+
+    DensitiesTagged(Day, "dlc_ft_Medium")
+    {
+        None("0%");
+		Medium("100%");
+    }
+	
+    DensitiesTagged(Night, "dlc_ft_Medium") 
+    {
+        None("0%");
+		Medium("0%");
+    }
+	
+    DensitiesTagged(Day, "dlc_ft_cc_roof") //[192.144928, 52.988647, -192.847595][0.063962, 0.037090, -0.997263]
+    {
+        None("0%");
+		//Medium("100%");
+		
+		//Medium(1, 1);
+		//Medium(1, 3);
+		//Medium(5, 7);
+		//Medium(8, 12);
+		//Medium("95-100%")
+		//Medium("40-60%")
+		//Medium("10%");
+		Medium("25%");
+		//Medium("50%");
+		//Medium("75%");
+		//Medium(1, 1, 100.0);
+		//Medium(2, 3, 100.0);
+		//Medium(5, 10, 100.0);
+		//Medium(10, 15, 100.0);
+    }
+	
+    DensitiesTagged(Night, "dlc_ft_cc_roof") 
+    {
+        None("0%");
+		Medium(1, 1);
+		//Medium("15%");
+    }
+	
+    DensitiesTagged(Day, "dlc_ft_cc_range")
+    {
+        None("0%");
+		//Medium(5, 7);
+		Medium("15%");
+    }
+	
+    DensitiesTagged(Night, "dlc_ft_cc_range") 
+    {
+        None("0%");
+		Medium("15%");
+    }
+	
+    
+    /////////////////////////////////////////////////////////////
+    // Dark Zone default densities
+    // Please, add a "dz_" prefix to densities definitions below
+	//[ Type ] , [ Min ] , [ Max ] , [ M^2 ]
+    /////////////////////////////////////////////////////////////
+
+	//////////////// EMPTY ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dz_empty")
+    {
+        None(0, 0, 100.0);
+		RunThrough(0, 0, 100.0);
+        Easy(0, 0, 100.0);
+		Medium(0, 0, 100.0);
+        Hard(0, 0, 100.0);
+        VeryHard(0, 0, 100.0); // Not used
+		
+        Industrial(0, 0, 100.0);
+    }
+    
+    DensitiesTagged(Night, "dz_empty")
+    {
+        None(0, 0, 100.0);
+		RunThrough(0, 0, 100.0);
+        Easy(0, 0, 100.0);
+        Medium(0, 0, 100.0);
+        Hard(0, 0, 100.0);
+        VeryHard(0, 0, 100.0); // Not used
+		
+        Industrial(0.0, 0, 100.0);
+    }    
+	
+	//////////////// TESTMAP_DARKZONES TESTING ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dz_testmap_darkzones")
+    {
+        None(0, 0, 100.0);
+		RunThrough(1, 2, 50.0);
+        Easy(2, 3, 75.0);
+		Medium(8, 10, 50.0);
+        Hard(15, 20, 50.0);
+        VeryHard(50, 50, 50.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+    
+    DensitiesTagged(Night, "dz_testmap_darkzones")
+    {
+        None(0, 0, 100.0);
+		RunThrough(0, 0.5, 100.0);
+        Easy(1, 1.5, 100.0);
+        Medium(1.5, 2, 100.0);
+        Hard(2, 3, 100.0);
+        VeryHard(2, 3, 100.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+	
+	//////////////// DEFAULT ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dz_default")
+    {
+        None(0, 0, 100.0);
+		RunThrough(1, 2, 100.0);
+        Easy(7, 10, 100.0);
+		Medium(7, 15, 100.0);
+        Hard(22, 25, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+    
+    DensitiesTagged(Night, "dz_default")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.0, 70.0);
+        Medium(8, 9, 70.0);
+        Hard(8, 9, 70.0);
+        VeryHard(8, 9, 70.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+    
+	//////////////// REGION_01 ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dz_region_01")
+    {
+        None(0, 0, 100.0);
+        RunThrough(2, 3, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+    
+    DensitiesTagged(Night, "dz_region_01")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+	
+	//////////////// REGION_02 ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dz_region_02")
+    {
+        None(0, 0, 100.0);
+		RunThrough(0, 0.5, 100.0);
+        Easy(0.5, 1.0, 100.0);
+        Medium(8, 9, 100.0);
+        Hard(8, 9, 100.0);
+        VeryHard(8, 9, 100.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+    
+    DensitiesTagged(Night, "dz_region_02")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 2, 70.0);
+        Medium(8, 11, 70.0);
+        Hard(8, 11, 70.0);
+        VeryHard(8, 11, 70.0); // Used for Shops and Dark Places
+		
+        Industrial(0.5, 1, 70.0);
+    }
+	
+	//////////////// DLC_FT City Center ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dlc_ft_cc")
+    {
+        None(0, 0, 100.0);
+        RunThrough(3, 4, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places  
+    }
+    
+    DensitiesTagged(Night, "dlc_ft_cc")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+	}
+
+    //////////////// DLC FT Swamps ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dlc_ft_sw")
+    {
+        None(0, 0, 100.0);
+        RunThrough(2, 3, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places	
+    }
+    
+    DensitiesTagged(Night, "dlc_ft_sw")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+    }
+
+    //////////////// DLC FT National Park ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dlc_ft_np")
+    {
+        None(0, 0, 100.0);
+        RunThrough(2, 3, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places	
+    }
+    
+    DensitiesTagged(Night, "dlc_ft_np")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+    }
+
+
+
+    //////////////// DLC FT Industrial ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dlc_ft_in")
+    {
+        None(0, 0, 100.0);
+        RunThrough(3, 4, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places	
+    }
+    
+    DensitiesTagged(Night, "dlc_ft_in")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+    }
+
+    //////////////// DLC FT Fields ////////////////
+	////////// Infected Population //////////
+	/////// Difficulty, Min, Max, M^2 //////
+	
+	DensitiesTagged(Day, "dlc_ft_fields")
+    {
+        None(0, 0, 100.0);
+        RunThrough(2, 3, 100.0);
+        Easy(10, 12, 100.0);
+        Medium(14, 16, 100.0);
+        Hard(18, 20, 100.0);
+        VeryHard(50, 50, 100.0); // Used for Shops and Dark Places	
+    }
+    
+    DensitiesTagged(Night, "dlc_ft_fields")
+    {
+        None(0, 0, 100.0);
+        RunThrough(0, 1, 70.0);
+        Easy(0.5, 1.5, 70.0);
+        Medium(8, 10, 70.0);
+        Hard(8, 10, 70.0);
+        VeryHard(8, 10, 70.0); // Used for Shops and Dark Places
+    }
+	
+    /////////////////////////////////////////////////////////////
+    // GROUPS DEFINITIONS
+    /////////////////////////////////////////////////////////////
+ 
+    Groups(Day)
+    {
+        ///// DYING LIGHT: THE BEAST DENSITIES /////
+        //NEW ITERATION - DAY
+        //Urban / Open environment
+        Urban_Sparse()      { Group(2, 3); Radius(4.5, 5.5); DistanceBetween(24.0); DistanceBetweenAlone(18.0); }
+        Urban_Moderate()    { Group(2, 3); Radius(4.5, 5.5); DistanceBetween(20.0); DistanceBetweenAlone(12.0); }
+        Urban_Dense()       { Group(2, 3); Radius(4.0, 5.0); DistanceBetween(12.0); DistanceBetweenAlone(8.0);  }
+        Urban_Packed()      { Group(2, 3); Radius(3.0, 4.0); DistanceBetween(8.0);  DistanceBetweenAlone(7.0);  }
+
+        //Wild / Open environment
+        Wild_Sparse()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(25.0); DistanceBetweenAlone(22.0); }
+        Wild_Moderate()     { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(20.0); DistanceBetweenAlone(18.0); }
+        Wild_Dense()        { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(14.0); }
+        Wild_Packed()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(10.0); }
+
+        // City Centre
+        CC_Density_Light()  { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(6.0);  DistanceBetweenAlone(6.0);  }
+        CC_Density_Heavy()  { Group(1, 2); Radius(1.0, 1.5); DistanceBetween(1.5);  DistanceBetweenAlone(6.0);  }
+
+        CC_Benchmark()      { Group(1, 1); Radius(10.0, 11.0); DistanceBetween(20.0);  }
+		
+		// Population Benchmark
+		Benchmark()  { Group(3, 3); Radius(2.0, 4.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); }
+
+        ///// DYING LIGHT: 2 DENSITIES /////
+		HUB()
+        {
+            Group(1, 1);
+            Radius(2.0, 2.0);
+            DistanceBetween(20.0);
+        }
+
+        OWA()
+        {
+            Group(1, 2);
+            Radius(2.0, 2.0);
+            DistanceBetween(15.0);
+        }
+
+        Park()
+        {
+            Group(1, 2);
+            Radius(2.0, 2.0);
+            DistanceBetween(12.0);
+        }		
+
+        Easy()
+        {
+            Group(1, 4);
+            Radius(2.0, 5.0);
+            DistanceBetween(8.0);
+        }
+
+        Medium()
+        {
+            Group(1,4);
+            Radius(3.5, 4.5);
+            DistanceBetween(4.0);
+        }
+		
+        Hard()
+        {
+            Group(1,5);
+            Radius(4.5, 7.0);
+            DistanceBetween(6.5);
+        }
+		
+        VeryHard()
+        {
+            Group(3,4);
+            Radius(5.0, 6.5);
+            DistanceBetween(5.0);
+        }
+		
+		RunThrough()
+        {
+            Group(4, 5);
+            Radius(2.0, 3.0);
+            DistanceBetween(26.0);
+        }
+
+        Flooded_1()
+        {
+            Group(1, 1);
+            Radius(0.5, 0.5);
+            DistanceBetween(10.0);
+        }
+        
+        Flooded_2()
+        {
+            Group(1, 1);
+            Radius(0.5, 0.5);
+            DistanceBetween(10.0);
+        }
+        
+        Flooded_3()
+        {
+            Group(1, 1);
+            Radius(1.3, 1.5);
+            DistanceBetween(5.5);
+        }
+		/////////// DLC 2 FRONTIER - OUTDATED /////
+        
+        Outpost()
+        {
+            Group(1, 1);
+            Radius(2.0, 2.0);
+            DistanceBetween(20.0);
+        }
+
+        Industrial()
+        {
+            Group(3,5);
+            Radius(3.0, 5.0);
+            DistanceBetween(17.0);
+        }
+
+        CC_Medium()
+        {
+            Group(1,3);
+            Radius(1.5, 3.0);
+            DistanceBetween(10.0);
+        }
+
+        CC_Medium_Backyard()
+        {
+            Group(4, 6);
+            Radius(2.0, 3.0);
+            DistanceBetween(2.5);
+        }
+
+        CC_Hard() //bit more dense than medium - player must feel the increment
+        {
+            Group(2,5);
+            Radius(2.0, 4.0);
+            DistanceBetween(9.5);
+        }
+
+        Swamp()
+        {
+            Group(3,5);
+            Radius(3.0, 5.0);
+            DistanceBetween(17.0);
+        }
+    }
+ 
+    Groups(Night)
+    {
+        ///// DYING LIGHT: THE BEAST DENSITIES /////
+        //NEW ITERATION - NIGHT
+        //Urban environments
+        Urban_Sparse()      { Group(2, 2); Radius(4.5, 5.5); DistanceBetween(24.0); DistanceBetweenAlone(20.0); }
+                            //Group: max -1 compared to day                         //DistanceBetweenAlone +2m compared to day
+        Urban_Moderate()    { Group(2, 2); Radius(4.5, 5.5); DistanceBetween(20.0); DistanceBetweenAlone(14.0); }
+                            //Group: max -1 compared to day                         //DistanceBetweenAlone +2m compared to day
+        Urban_Dense()       { Group(2, 2); Radius(4.0, 5.0); DistanceBetween(16.0); DistanceBetweenAlone(10.0); }
+                            //Group: max -1 compared to day  //DistanceBetween +4m compared to day   //DistanceBetweenAlone +2m compared to day
+        Urban_Packed()      { Group(2, 2); Radius(3.0, 4.0); DistanceBetween(14.0); DistanceBetweenAlone(10.0); }
+                            //Group: max -1 compared to day  //DistanceBetween +6m compared to day   //DistanceBetweenAlone +3m compared to day
+        
+        //Wild environment
+        Wild_Sparse()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(27.0); DistanceBetweenAlone(22.0); }
+                                                            //DistanceBetween +2m compared to day
+        Wild_Moderate()     { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(22.0); DistanceBetweenAlone(18.0); }
+                                                            //DistanceBetween +2m compared to day
+        Wild_Dense()        { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(16.0); }
+                                                                                    //DistanceBetweenAlone +2m compared to day
+        Wild_Packed()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(12.0); }
+                                                                                    //DistanceBetweenAlone +2m compared to day
+        
+        // City Centre
+        CC_Density_Light()  { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(9.0);  }
+                            //1 entity groups compared to day //DistanceBetween +3m compared to day
+        CC_Density_Heavy()  { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(6.0);  }
+                            //1 entity groups compared to day //DistanceBetween +4.5m compared to day
+
+        CC_Benchmark()      { Group(1, 1); Radius(10.0, 11.0); DistanceBetween(20.0);  }
+		
+		// Population Benchmark
+        Benchmark()  { Group(3, 3); Radius(2.0, 4.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); }
+
+        ///// DYING LIGHT: 2 DENSITIES /////
+		HUB()
+        {
+            Group(1, 3);
+            Radius(2.0, 2.0);
+            DistanceBetween(20.0);
+        }
+
+        OWA()
+        {
+            Group(1, 2);
+            Radius(2.0, 2.0);
+            DistanceBetween(15.0);
+        }
+
+        Park()
+        {
+            Group(1, 2);
+            Radius(2.0, 2.0);
+            DistanceBetween(12.0);
+        }		
+
+        Easy()
+        {
+            Group(1, 4);
+            Radius(2.0, 5.0);
+            DistanceBetween(8.0);
+        }
+
+        Medium()
+        {
+            Group(1,4);
+            Radius(3.5, 4.5);
+            DistanceBetween(4.0);
+        }
+		
+        Hard()
+        {
+            Group(1,5);
+            Radius(4.5, 7.0);
+            DistanceBetween(6.5);
+        }
+		
+        VeryHard()
+        {
+            Group(3,4);
+            Radius(5.0, 6.5);
+            DistanceBetween(5.0);
+        }
+		
+		RunThrough()
+        {
+            Group(4, 5);
+            Radius(2.0, 3.0);
+            DistanceBetween(26.0);
+        }
+
+        Flooded_1()
+        {
+            Group(1, 1);
+            Radius(0.5, 0.5);
+            DistanceBetween(10.0);
+        }
+        
+        Flooded_2()
+        {
+            Group(1, 1);
+            Radius(0.5, 0.5);
+            DistanceBetween(10.0);
+        }
+        
+        Flooded_3()
+        {
+            Group(1, 1);
+            Radius(1.3, 1.5);
+            DistanceBetween(5.5);
+        }
+        
+		/////////// DLC 2 FRONTIER - OUTDATED/////
+        
+        Outpost()
+        {
+            Group(1, 1);
+            Radius(1.4, 1.5);
+            DistanceBetween(15.0);
+        }
+
+        Industrial()
+        {
+            Group(4,10);
+            Radius(5.0, 10.0);
+            DistanceBetween(25.0);
+        }
+
+        CC_Medium()
+        {
+            Group(3,5);
+            Radius(10.0, 10.0);
+            DistanceBetween(100.0);
+        }
+
+        CC_Medium_Backyard()
+        {
+            Group(4, 6);
+            Radius(2.0, 3.0);
+            DistanceBetween(2.5);
+        }
+
+        CC_Hard() //bit more dense than medium - player must feel the increment
+        {
+            Group(2,5);
+            Radius(2.0, 4.0);
+            DistanceBetween(9.5);
+        }
+
+        Swamp()
+        {
+            Group(3,5);
+            Radius(3.0, 5.0);
+            DistanceBetween(17.0);
+        }
+    }
+    
+    GroupsTagged(Night, "rooftop")
+    {
+        // override night grouping - virals on rooftops will be spawned as single units
+    }
+
+    GroupsTagged(Day, "dlc_ft_ind_range") { }
+    GroupsTagged(Night, "dlc_ft_ind_range") { }
+
+    GroupsTagged(Day, "dlc_ft_cc_range") { }
+    GroupsTagged(Night, "dlc_ft_cc_range") { }
+	
+    GroupsTagged(Day, "DLC2_Pavement_Easy")
+    {
+        DLC_FT_testing() { Group(1, 3); Radius(2, 3); DistanceBetween(1.0); }
+    }
+    GroupsTagged(Night, "DLC2_Pavement_Easy")
+    {
+        DLC_FT_testing() { Group(1, 3); Radius(2, 3); DistanceBetween(1.0); }
+    }
+
+    ////// Gameplay Diversifier - City Centre
+    GroupsTagged(Day, "DLC2_Street_VeryHard")
+    {
+        CC_Density_Light() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        CC_Density_Heavy() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+    GroupsTagged(Night, "DLC2_Street_VeryHard")
+    {
+        CC_Density_Light() { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(9.0); }
+        CC_Density_Heavy() { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(6.0); }
+    }
+
+    ////// Gameplay Diversifier - NOT CC
+    GroupsTagged(Day, "DLC2_Street_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+    GroupsTagged(Night, "DLC2_Street_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+
+    GroupsTagged(Day, "DLC2_Square_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+    GroupsTagged(Night, "DLC2_Square_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+	
+	GroupsTagged(Day, "DLC2_Forest_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+    GroupsTagged(Night, "DLC2_Forest_Hard")
+    {
+        Urban_Sparse() { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Urban_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Sparse() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Moderate() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Dense() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+        Wild_Packed() { Group(1, 2); Radius(1.5, 3.0); DistanceBetween(3.0); DistanceBetweenAlone(3.0); }
+    }
+	
+    //////////////////////////////////
+    ///// Population benchmark  //////
+    //////////////////////////////////
+
+    // [Urban Day]
+	GroupsTagged(Day, "DLC2_UrbanSmall_Easy")         { Benchmark()    { Group(1, 2); Radius(3.0, 5.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_UrbanMedium_Easy")         { Benchmark()    { Group(1, 1); Radius(2.0, 5.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_UrbanLarge_Easy")         { Benchmark()    { Group(1, 1); Radius(4.0, 7.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	
+	GroupsTagged(Day, "DLC2_UrbanSmall_Medium")       { Benchmark()    { Group(2, 3); Radius(3.0, 6.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_UrbanMedium_Medium")       { Benchmark()    { Group(1, 3); Radius(4.0, 6.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	GroupsTagged(Day, "DLC2_UrbanLarge_Medium")       { Benchmark()    { Group(1, 3); Radius(5.0, 6.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	
+	GroupsTagged(Day, "DLC2_UrbanSmall_Hard")         { Benchmark()    { Group(3, 4); Radius(3.0, 4.0); DistanceBetween(4.5);  DistanceBetweenAlone(4.5);} }
+	GroupsTagged(Day, "DLC2_UrbanMedium_Hard")         { Benchmark()    { Group(1, 3); Radius(3.0, 4.0); DistanceBetween(5.0);  DistanceBetweenAlone(5.0);} }
+	GroupsTagged(Day, "DLC2_UrbanLarge_Hard")         { Benchmark()    { Group(1, 3); Radius(3.0, 4.0); DistanceBetween(5.0);  DistanceBetweenAlone(5.0);} }
+
+	GroupsTagged(Day, "DLC2_UrbanSmall_VeryHard")     { Benchmark()    { Group(2, 4); Radius(2.0, 3.0); DistanceBetween(2.5); DistanceBetweenAlone(2.5); } }
+	GroupsTagged(Day, "DLC2_UrbanMedium_VeryHard")     { Benchmark()    { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(2.5); DistanceBetweenAlone(2.5); } }
+	GroupsTagged(Day, "DLC2_UrbanLarge_VeryHard")     { Benchmark()    { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(2.5); DistanceBetweenAlone(2.5); } }
+	
+	
+	// [Wild Day]	
+	GroupsTagged(Day, "DLC2_WildSmall_Easy")         { Benchmark()    { Group(1, 2); Radius(3.0, 5.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_WildMedium_Easy")         { Benchmark()    { Group(1, 1); Radius(2.0, 5.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_WildLarge_Easy")         { Benchmark()    { Group(1, 1); Radius(5.0, 7.0); DistanceBetween(20.0); DistanceBetweenAlone(20.0); } }
+	
+	GroupsTagged(Day, "DLC2_WildSmall_Medium")       { Benchmark()    { Group(2, 3); Radius(3.5, 5.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Day, "DLC2_WildMedium_Medium")       { Benchmark()    { Group(1, 3); Radius(5.0, 6.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	GroupsTagged(Day, "DLC2_WildLarge_Medium")       { Benchmark()    { Group(1, 3); Radius(5.0, 6.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	
+	GroupsTagged(Day, "DLC2_WildSmall_Hard")         { Benchmark()    { Group(3, 4); Radius(3.0, 4.0); DistanceBetween(4.5);  DistanceBetweenAlone(4.5); } }
+	GroupsTagged(Day, "DLC2_WildMedium_Hard")         { Benchmark()    { Group(1, 3); Radius(3.0, 4.0); DistanceBetween(6.0);  DistanceBetweenAlone(6.0); } }
+	GroupsTagged(Day, "DLC2_WildLarge_Hard")         { Benchmark()    { Group(1, 3); Radius(3.0, 4.0); DistanceBetween(6.0);  DistanceBetweenAlone(6.0); } }
+
+	GroupsTagged(Day, "DLC2_WildSmall_VeryHard")     { Benchmark()    { Group(2, 4); Radius(2.0, 3.0); DistanceBetween(2.5); DistanceBetweenAlone(2.5); } }
+	GroupsTagged(Day, "DLC2_WildMedium_VeryHard")     { Benchmark()    { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(4.0); DistanceBetweenAlone(4.0); } }
+	GroupsTagged(Day, "DLC2_WildLarge_VeryHard")     { Benchmark()    { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(4.0); DistanceBetweenAlone(4.0); } }
+
+
+	// [Urban Night]
+	GroupsTagged(Night, "DLC2_UrbanSmall_Easy")         { Benchmark()    { Group(1, 1); Radius(3.5, 5.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_UrbanMedium_Easy")         { Benchmark()    { Group(1, 1); Radius(4.0, 7.0); DistanceBetween(20.0); DistanceBetweenAlone(20.0); } }
+	GroupsTagged(Night, "DLC2_UrbanLarge_Easy")         { Benchmark()    { Group(1, 1); Radius(4.0, 7.0); DistanceBetween(24.0); DistanceBetweenAlone(24.0); } }
+	
+	GroupsTagged(Night, "DLC2_UrbanSmall_Medium")       { Benchmark()    { Group(1, 2); Radius(3.5, 5.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_UrbanMedium_Medium")       { Benchmark()    { Group(1, 2); Radius(5.0, 6.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_UrbanLarge_Medium")       { Benchmark()    { Group(1, 2); Radius(5.0, 6.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	
+	GroupsTagged(Night, "DLC2_UrbanSmall_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5);} }
+	GroupsTagged(Night, "DLC2_UrbanMedium_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5);} }
+	GroupsTagged(Night, "DLC2_UrbanLarge_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5);} }
+
+	GroupsTagged(Night, "DLC2_UrbanSmall_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Night, "DLC2_UrbanMedium_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Night, "DLC2_UrbanLarge_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	
+	// [Wild Night]
+	GroupsTagged(Night, "DLC2_WildSmall_Easy")         { Benchmark()    { Group(1, 1); Radius(3.5, 5.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_WildMedium_Easy")         { Benchmark()    { Group(1, 1); Radius(5.0, 7.0); DistanceBetween(20.0); DistanceBetweenAlone(20.0); } }
+	GroupsTagged(Night, "DLC2_WildLarge_Easy")         { Benchmark()    { Group(1, 1); Radius(5.0, 7.0); DistanceBetween(28.0); DistanceBetweenAlone(28.0); } }
+	
+	GroupsTagged(Night, "DLC2_WildSmall_Medium")       { Benchmark()    { Group(1, 2); Radius(3.5, 5.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_WildMedium_Medium")       { Benchmark()    { Group(1, 2); Radius(5.0, 6.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	GroupsTagged(Night, "DLC2_WildLarge_Medium")       { Benchmark()    { Group(1, 2); Radius(5.0, 6.0); DistanceBetween(15.0); DistanceBetweenAlone(15.0); } }
+	
+	GroupsTagged(Night, "DLC2_WildSmall_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5); } }
+	GroupsTagged(Night, "DLC2_WildMedium_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5); } }
+	GroupsTagged(Night, "DLC2_WildLarge_Hard")         { Benchmark()    { Group(1, 2); Radius(3.0, 4.0); DistanceBetween(12.5);  DistanceBetweenAlone(12.5); } }
+
+	GroupsTagged(Night, "DLC2_WildSmall_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Night, "DLC2_WildMedium_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	GroupsTagged(Night, "DLC2_WildLarge_VeryHard")     { Benchmark()    { Group(1, 2); Radius(2.0, 3.0); DistanceBetween(10.0); DistanceBetweenAlone(10.0); } }
+	
+	// Hive [Low Density at Day, Highly Dense at night]
+	GroupsTagged(Day, "DLC2_Street_Medium")         { Benchmark()    { Group(1, 3); Radius(3.0, 4.0); DistanceBetween(6.0);  DistanceBetweenAlone(6.0);} }
+	GroupsTagged(Night, "DLC2_Street_Medium")     { Benchmark()    { Group(1, 3); Radius(2.0, 3.0); DistanceBetween(2.5); DistanceBetweenAlone(2.5); } }
+	
+	// Spitters [Day/Night]
+	GroupsTagged(Day, "Spitter")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	GroupsTagged(Night, "Spitter")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	
+	// Goons [Day/Night]
+	GroupsTagged(Day, "Goon")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	GroupsTagged(Night, "Goon")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+
+	// Demolishers [Day/Night]
+	GroupsTagged(Day, "Demolisher")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	GroupsTagged(Night, "Demolisher")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	
+	// Suiciders [Day/Night]
+	GroupsTagged(Day, "Suicider")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+	GroupsTagged(Night, "Suicider")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(1.0); } }
+
+	// Banshee [Day/Night]
+	GroupsTagged(Day, "Banshee")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(250.0); } }
+	GroupsTagged(Night, "Banshee")         { Benchmark()    { Group(1, 1); Radius(0.5, 1.0); DistanceBetween(1.0); DistanceBetweenAlone(250.0); } }
+
+	// RoofTops [Day]
+	GroupsTagged(Day, "DLC2_Roof_Easy")         { Benchmark()    { Group(1, 3); Radius(2.0, 5.0); DistanceBetween(7.0); DistanceBetweenAlone(7.0); } }
+	GroupsTagged(Day, "DLC2_RoofMedium_Easy")         { Benchmark()    { Group(1, 3); Radius(2.0, 5.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	GroupsTagged(Day, "DLC2_RoofLarge_Easy")         { Benchmark()    { Group(1, 3); Radius(2.0, 5.0); DistanceBetween(11.0); DistanceBetweenAlone(11.0); } }
+	GroupsTagged(Day, "DLC2_Roof_Medium")         { Benchmark()    { Group(1, 2); Radius(4.0, 6.0); DistanceBetween(8.0); DistanceBetweenAlone(8.0); } }
+	GroupsTagged(Day, "DLC2_Roof_Hard")         { Benchmark()    { Group(1, 3); Radius(2.5, 4.0); DistanceBetween(6.0); DistanceBetweenAlone(6.0); } }
+	GroupsTagged(Day, "DLC2_Roof_VeryHard")         { Benchmark()    { Group(2, 4); Radius(2.0, 3.0); DistanceBetween(4.0); DistanceBetweenAlone(4.0); } }
+	
+	// RoofTops [Night]
+	GroupsTagged(Night, "DLC2_Roof_Easy")         { Benchmark()    { Group(1, 1); Radius(2.0, 5.0); DistanceBetween(7.0); DistanceBetweenAlone(7.0); } }
+	GroupsTagged(Night, "DLC2_RoofMedium_Easy")         { Benchmark()    { Group(1, 1); Radius(4.0, 6.0); DistanceBetween(9.0); DistanceBetweenAlone(9.0); } }
+	GroupsTagged(Night, "DLC2_RoofLarge_Easy")         { Benchmark()    { Group(1, 1); Radius(4.0, 6.0); DistanceBetween(12.0); DistanceBetweenAlone(12.0); } }
+	GroupsTagged(Night, "DLC2_Roof_Medium")         { Benchmark()    { Group(1, 1); Radius(4.0, 6.0); DistanceBetween(8.0); DistanceBetweenAlone(8.0); } }
+	GroupsTagged(Night, "DLC2_Roof_Hard")         { Benchmark()    { Group(1, 1); Radius(2.5, 4.0); DistanceBetween(6.0); DistanceBetweenAlone(6.0); } }
+	GroupsTagged(Night, "DLC2_Roof_VeryHard")         { Benchmark()    { Group(1, 1); Radius(2.0, 3.0); DistanceBetween(4.0); DistanceBetweenAlone(4.0); } }
+
+	
+/*
+        Urban_Sparse()      { Group(2, 3); Radius(4.5, 5.5); DistanceBetween(24.0); DistanceBetweenAlone(18.0); }
+        Urban_Moderate()    { Group(2, 3); Radius(4.5, 5.5); DistanceBetween(20.0); DistanceBetweenAlone(12.0); }
+        Urban_Dense()       { Group(2, 3); Radius(4.0, 5.0); DistanceBetween(12.0); DistanceBetweenAlone(8.0);  }
+        Urban_Packed()      { Group(2, 3); Radius(3.0, 4.0); DistanceBetween(8.0);  DistanceBetweenAlone(7.0);  }
+
+        Urban_Sparse()      { Group(2, 2); Radius(4.5, 5.5); DistanceBetween(24.0); DistanceBetweenAlone(20.0); }
+                            //Group: max -1 compared to day                         //DistanceBetweenAlone +2m compared to day
+        Urban_Moderate()    { Group(2, 2); Radius(4.5, 5.5); DistanceBetween(20.0); DistanceBetweenAlone(14.0); }
+                            //Group: max -1 compared to day                         //DistanceBetweenAlone +2m compared to day
+        Urban_Dense()       { Group(2, 2); Radius(4.0, 5.0); DistanceBetween(16.0); DistanceBetweenAlone(10.0); }
+                            //Group: max -1 compared to day  //DistanceBetween +4m compared to day   //DistanceBetweenAlone +2m compared to day
+        Urban_Packed()      { Group(2, 2); Radius(3.0, 4.0); DistanceBetween(14.0); DistanceBetweenAlone(10.0); }
+                            //Group: max -1 compared to day  //DistanceBetween +6m compared to day   //DistanceBetweenAlone +3m compared to day
+        
+        //Wild environment
+        Wild_Sparse()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(27.0); DistanceBetweenAlone(22.0); }
+                                                            //DistanceBetween +2m compared to day
+        Wild_Moderate()     { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(22.0); DistanceBetweenAlone(18.0); }
+                                                            //DistanceBetween +2m compared to day
+        Wild_Dense()        { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(16.0); }
+                                                                                    //DistanceBetweenAlone +2m compared to day
+        Wild_Packed()       { Group(1, 2); Radius(1.5, 2.5); DistanceBetween(15.0); DistanceBetweenAlone(12.0); }
+                                                                                    //DistanceBetweenAlone +2m compared to day
+        
+        // City Centre
+        CC_Density_Light()  { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(9.0);  }
+                            //1 entity groups compared to day //DistanceBetween +3m compared to day
+        CC_Density_Heavy()  { Group(1, 1); Radius(1.0, 1.5); DistanceBetween(6.0);  }
+                            //1 entity groups compared to day //DistanceBetween +4.5m compared to day
+*/
+}

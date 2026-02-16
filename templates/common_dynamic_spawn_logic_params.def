@@ -1,0 +1,37 @@
+sub CommonParams()
+{
+    Param("SpawnRadiusDay", "60");
+    Param("SpawnRadiusNight", "60");
+    Param("SpawnRadiusDayStartTime", "6.5");
+    Param("SpawnRadiusDayEndTime", "19.5");
+    Param("CrowdMinSpawnRadius", "20");
+
+    Param("MinSpawnedAIsToBeginDespawn", "0");
+    
+    Param("DistFromBuildingEdge", "3");
+
+    Param("CheckCurrentRegionEverySeconds", "5");
+    
+    Param("FrontAngleSpawn", "74");
+    Param("FrontAngleDespawn", "78");
+    Param("InnerRadiusSpawnNight", "19.5");
+    Param("InnerRadiusDespawnNight", "20");
+    Param("InnerRadiusSpawnDay", "29");
+    Param("InnerRadiusDespawnDay", "30");
+    
+    Param("InBuildingFrontAngleSpawn", "60");
+    Param("InBuildingFrontAngleDespawn", "80");
+    Param("InBuildingInnerRadiusSpawnDay", "10");
+    Param("InBuildingInnerRadiusDespawnDay", "15");
+    Param("InBuildingInnerRadiusSpawnNight", "10");
+    Param("InBuildingInnerRadiusDespawnNight", "15");
+    Param("InBuildingExternRadiusSpawn", "40");
+    Param("InBuildingExternRadiusDespawn", "50");
+
+    Param("AIDensityBalancingOn", "false");
+    Param("AIDensityMaxAIsInSpawnArea", "63");
+    Param("AIDensityMinDistanceToAllowSpawnBlockForCrowdAIs", "65");
+    Param("AIDensityPercentageThresholdOfAIsSpawnedToStartDynamicDecreaseOfAIDensity", "0.9");
+    Param("AIDensityDynamicDecreaseOfAIDensityPercentage", "0.25");
+    Param("AIDensityIgnoreDefault", "false");
+}
