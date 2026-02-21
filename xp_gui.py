@@ -16,20 +16,31 @@
 # 1) Imports & constants
 # -----------------------------
 
+# --- Standard library ---
 import os
 import re
-import shutil
-import zipfile
-import datetime
-import tkinter as tk
 import sys
 import json
-from PIL import Image, ImageTk
+import ctypes
+import shutil
+import subprocess
+import zipfile
+import datetime
+import time
+import webbrowser
 from pathlib import Path
-from tkinter import ttk
-from tkinter import filedialog, messagebox
 from dataclasses import dataclass
-from tkinter import colorchooser
+
+# --- Third-party ---
+import ttkbootstrap as tb
+from ttkbootstrap.constants import *
+from PIL import Image, ImageTk
+from tkinterdnd2 import DND_FILES, TkinterDnD
+
+# --- Tkinter ---
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox, colorchooser
+
 
 @dataclass
 class FlashlightParams:
@@ -41,14 +52,932 @@ class FlashlightParams:
 APP_NAME = "DLTB Configurator"
 OUTPUT_DIR = "output"
 PAK_NAME = "data7.pak"
+STATUS_REF = [None]
+APP_ROOT = Path(__file__).resolve().parent
 
+def status(items):
+    cb = STATUS_REF[0]
+    if cb:
+        cb(items)  
+        
+SMM_CONFIG_PATH = Path("config") / "tools.json"
+
+# DPI-aware (valfritt men rekommenderat) - måste ligga innan root skapas
+def enable_high_dpi_awareness():
+    if sys.platform.startswith("win"):
+        try:
+            # Per-monitor DPI aware (Win 8.1+)
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)
+        except Exception:
+            try:
+                ctypes.windll.user32.SetProcessDPIAware()
+            except Exception:
+                pass
+
+enable_high_dpi_awareness()
+
+# AppUserModelID måste sättas FÖRE något fönster skapas (Windows taskbar/ikon)
+if sys.platform.startswith("win"):
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("DLTB.Configurator")
+    except Exception:
+        pass
+
+# Skapa root
+root = tb.Window(
+    themename="darkly",
+    title="DLTB Configurator by Robeloto v0.6b",
+    size=(1100, 750),
+)
+
+try:
+    dpi = root.winfo_fpixels("1i")      # 
+    scale = dpi / 72.0                  # OBS: 72 brukar kännas bättre i Tk på Windows
+    scale = max(1.10, min(2.00, scale)) # clamp
+    root.tk.call("tk", "scaling", scale)
+except Exception:
+    pass
+
+# Sen layout-grejer
+root.minsize(1050, 650)
+
+def _load_tools_cfg() -> dict:
+    try:
+        if SMM_CONFIG_PATH.exists():
+            return json.loads(SMM_CONFIG_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {}
+
+def _save_tools_cfg(cfg: dict):
+    SMM_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SMM_CONFIG_PATH.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
+
+def find_super_mod_merger_exe() -> Path | None:
+    # 1) sparad path
+    cfg = _load_tools_cfg()
+    p = cfg.get("super_mod_merger_exe")
+    if p:
+        pp = Path(p)
+        if pp.exists():
+            return pp
+
+    # 2) om du installerat SMM som en “mod” via din app
+    try:
+        for mod_root, manifest in list_installed_mods():
+            raw_dir = mod_root / "raw"
+            exe = raw_dir / "SuperModMerger.exe"
+            if exe.exists():
+                return exe
+    except Exception:
+        pass
+
+    # 3) vanliga nedladdningsställen
+    candidates = [
+        Path.home() / "Downloads" / "SuperModMerger.exe",
+        Path.home() / "Desktop" / "SuperModMerger.exe",
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+
+    # 4) sök i senaste Downloads-zip-extract-mappar (lite dyrt men ok)
+    dl = Path.home() / "Downloads"
+    if dl.exists():
+        try:
+            for exe in dl.rglob("SuperModMerger.exe"):
+                return exe
+        except Exception:
+            pass
+
+    return None
+
+def pick_super_mod_merger_exe() -> Path | None:
+    p = filedialog.askopenfilename(
+        title="Select SuperModMerger.exe",
+        filetypes=[("Executable", "*.exe"), ("All files", "*.*")],
+    )
+    if not p:
+        return None
+    exe = Path(p)
+    cfg = _load_tools_cfg()
+    cfg["super_mod_merger_exe"] = str(exe)
+    _save_tools_cfg(cfg)
+    return exe
+
+def run_super_mod_merger(game_root: Path):
+    exe = find_super_mod_merger_exe()
+    if not exe:
+        exe = pick_super_mod_merger_exe()
+        if not exe:
+            status([(" Super Mod Merger not set. Choose SuperModMerger.exe first.", "warn")])
+            return
+
+    game_root = Path(str(game_root).strip())
+    phft = game_root / "ph_ft"
+    if not phft.exists():
+        status([(" Select valid Game Folder (must contain ph_ft).", "warn")])
+        return
+
+    # SMM behöver se ./mods (din app) + data0.pak (ph_ft)
+    # Lösning: kör i ph_ft och skapa en länk/junction 'mods' -> din app's mods
+    app_root = Path(__file__).resolve().parent
+    mods_src = app_root / "mods"
+    mods_link = phft / "mods"
+
+    try:
+        mods_src.mkdir(exist_ok=True)
+
+        if not mods_link.exists():
+            # Windows junction: ph_ft/mods -> <app_root>/mods
+            subprocess.run(["cmd", "/c", "mklink", "/J", str(mods_link), str(mods_src)], check=True)
+
+        subprocess.Popen([str(exe)], cwd=str(phft))
+        status([(" Opened Super Mod Merger ✔  ", "ok"), ("Run merge, then Play Game.", "warn")])
+    except Exception as e:
+        status([(" Failed to start Super Mod Merger: ", "warn"), (str(e), "warn")])
+        
+def files_url(mod_id: int, file_id: int | None = None) -> str:
+    url = f"https://www.nexusmods.com/dyinglightthebeast/mods/{mod_id}?tab=files"
+    if file_id:
+        url += f"&file_id={file_id}"
+    return url
+
+def nmm_url(mod_id: int, file_id: int) -> str:
+    return f"https://www.nexusmods.com/dyinglightthebeast/mods/{mod_id}?tab=files&file_id={file_id}&nmm=1"
+
+RECOMMENDED_MODS = [
+    {
+        "name": "Apex Volatile Revamp",
+        "mod_id": 745,
+        "file_id": 2485,
+        "affects": ["dlc_ft_zmb_volatile_apex.model"],
+    },
+    {
+        "name": "Arankt's best vehicle enhancements",
+        "mod_id": 716,
+        "file_id": 2353,
+        "affects": ["damagedefinitions.scr", "healthdefinitions.scr", "vehicle_skin_presets.scr", "car.scr"],
+        "notes": "+ more",
+    },
+    {
+        "name": "Better Flashlight",
+        "mod_id": 81,
+        "file_id": 132,
+        "affects": ["varlist.scr"],
+    },
+    {
+        "name": "Better Fov",
+        "mod_id": 751,
+        "file_id": None,
+        "affects": ["player_variables.scr", "vehicle_pickup_camera_params.scr", "buggy_wasteland_camera_params.scr", "vehicle_truck_camera_params.scr"],
+    },
+    {
+        "name": "Infinite durability and Stamina",
+        "mod_id": 774,
+        "file_id": 2591,
+        "affects": ["player_variables.scr"],
+    },
+    {
+        "name": "Play as Frank West",
+        "mod_id": 772,
+        "file_id": 2588,
+        "affects": ["player_outfit_slots.scr"],
+    },
+    {
+        "name": "Restore Nightmare Mode Survivor Sense",
+        "mod_id": 767,
+        "file_id": None,
+        "affects": ["NightmareSurvivorSense.asi"],
+    },
+    {
+        "name": "Special Weapons Blueprints",
+        "mod_id": 686,
+        "file_id": 2212,
+        "file_id": 2212,
+        "affects": ["collectables_ft.scr", "shop_item_sets.scr"],
+    },
+        {
+        "name": "Super Mod Merger",
+        "mod_id": 699,
+        "file_id": 2512,
+        "affects": [""],
+    },
+]
+
+def ensure_mod_urls():
+    for m in RECOMMENDED_MODS:
+        m["url"] = files_url(m["mod_id"], m.get("file_id"))
+        file_id = m.get("file_id")
+        m["nmm_url"] = nmm_url(m["mod_id"], file_id) if file_id else None
+
+ensure_mod_urls()
+
+def pick_mod_archive():
+    path = filedialog.askopenfilename(
+        title="Select mod archive",
+        filetypes=[
+            ("Archives", "*.zip *.7z *.rar"),
+            ("ZIP", "*.zip"),
+            ("7-Zip", "*.7z"),
+            ("RAR", "*.rar"),
+            ("All files", "*.*"),
+        ],
+    )
+    return Path(path) if path else None
+    
+def find_7z_exe() -> Path | None:
+    # 1) bundlad (rekommenderat)
+    bundled = Path(resource_path("assets/tools/7z.exe"))
+    if bundled.exists():
+        return bundled
+
+    # 2) system-install (vanliga paths)
+    candidates = [
+        Path(r"C:\Program Files\7-Zip\7z.exe"),
+        Path(r"C:\Program Files (x86)\7-Zip\7z.exe"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+
+    # 3) PATH
+    p = shutil.which("7z")
+    return Path(p) if p else None
+
+def extract_archive(archive_path: Path, dest_dir: Path):
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    seven = find_7z_exe()
+    if not seven:
+        messagebox.showerror(
+            "7-Zip not found",
+            "To install .rar/.7z mods, include assets/tools/7z.exe (and 7z.dll) "
+            "or install 7-Zip to C:\\Program Files\\7-Zip."
+        )
+        return False
+
+    # 7z x = extract with full paths, -y = yes to all, -o = output dir
+    cmd = [str(seven), "x", str(archive_path), f"-o{dest_dir}", "-y"]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if r.returncode != 0:
+            messagebox.showerror("Extract failed", (r.stderr or r.stdout or "Unknown error").strip())
+            return False
+        return True
+    except Exception as e:
+        messagebox.showerror("Extract failed", str(e))
+        return False
+
+import time
+
+def flatten_single_root_folder(dest: Path):
+    items = [p for p in dest.iterdir()]
+    if len(items) == 1 and items[0].is_dir():
+        root = items[0]
+        for p in root.iterdir():
+            shutil.move(str(p), str(dest / p.name))
+        shutil.rmtree(root, ignore_errors=True)
+
+def install_mod_archive_button():
+    archive = pick_mod_archive()
+    if not archive:
+        return
+
+    mod_name = archive.stem
+    mod_root = MODS_DIR / mod_name
+    raw_dir = mod_root / "raw"
+
+    MODS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # overwrite-fråga
+    if mod_root.exists():
+        if not messagebox.askyesno("Overwrite?", f"{mod_name} already exists. Overwrite?"):
+            return
+        shutil.rmtree(mod_root, ignore_errors=True)
+
+    raw_dir.mkdir(parents=True, exist_ok=True)
+
+    ok = extract_archive(archive, raw_dir)
+    if not ok:
+        shutil.rmtree(mod_root, ignore_errors=True)
+        return
+
+    # optional
+    flatten_single_root_folder(raw_dir)
+
+    # indexera filer
+    files = [str(p.relative_to(raw_dir)).replace("\\", "/") for p in raw_dir.rglob("*") if p.is_file()]
+    scr_files = [f for f in files if f.lower().endswith(".scr")]
+
+    manifest = {
+        "name": mod_name,
+        "installed_at": datetime.datetime.now().isoformat(timespec="seconds"),
+        "enabled": True,
+        "archive_path": str(archive),
+        "raw_dir": str(raw_dir),
+        "files": files,
+        "scr_files": scr_files,
+        "priority": {},  # ex: {"player_variables.scr": "mod_wins"}
+    }
+
+    (mod_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    # Status i GUI (inga popups)
+    status([
+        (" Mod added to Configurator ✔  ", "ok"),
+        ("Next: Deploy → Apply → Build & Install PAK", "warn"),
+    ])
+
+def open_url(url: str):
+    url = (url or "").strip()
+    print("[OPEN_URL] url =", repr(url))
+    if not url:
+        messagebox.showwarning("Open link", "Empty URL")
+        return
+
+    try:
+        # robustare än webbrowser.open i vissa lägen
+        webbrowser.open_new_tab(url)
+    except Exception as e:
+        messagebox.showerror("Open link failed", str(e))
+
+def open_mod_files(mod: dict):
+    open_url(files_url(mod["mod_id"], mod.get("file_id")))
+
+def open_mod_manager(mod: dict):
+    file_id = mod.get("file_id")
+    if not file_id:
+        messagebox.showinfo("Not available", "No file_id set for this mod.")
+        return
+    open_url(nmm_url(mod["mod_id"], file_id))
+
+SCRIPTS_DIR = Path("scripts")  # "DLTB Configurator\\scripts" när du kör från projektroten
+MODS_DIR = Path("mods") / "installed"
+
+PARAM_RE = re.compile(r'(?m)^\s*Param\("([^"]+)"\s*,\s*"([^"]*)"\)\s*;\s*$')
+
+def get_enabled_mods() -> list[tuple[Path, dict]]:
+    mods = []
+    if not MODS_DIR.exists():
+        return mods
+    for mod_root in sorted(MODS_DIR.iterdir()):
+        if not mod_root.is_dir():
+            continue
+        mf = mod_root / "manifest.json"
+        if not mf.exists():
+            continue
+        try:
+            manifest = json.loads(mf.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if manifest.get("enabled", False):
+            mods.append((mod_root, manifest))
+    return mods
+
+def extract_params(text: str) -> dict[str, str]:
+    return {m.group(1): m.group(2) for m in PARAM_RE.finditer(text)}
+
+def replace_param(text: str, name: str, value: str) -> str:
+    pat = re.compile(rf'(?m)^(\s*Param\("{re.escape(name)}"\s*,\s*")([^"]*)("\)\s*;\s*)$')
+    if not pat.search(text):
+        return text
+    return pat.sub(rf'\g<1>{value}\g<3>', text, count=1)
+
+def merge_scr(config_text: str, mod_text: str, mod_wins: bool) -> tuple[str, list[tuple[str,str,str]]]:
+    cfg = extract_params(config_text)
+    mod = extract_params(mod_text)
+    merged = config_text
+    conflicts = []
+
+    for k, mod_val in mod.items():
+        if k in cfg and cfg[k] != mod_val:
+            conflicts.append((k, cfg[k], mod_val))
+            if mod_wins:
+                merged = replace_param(merged, k, mod_val)
+
+    return merged, conflicts
+
+def find_all_mod_scr_files(mod_root: Path) -> list[Path]:
+    raw_dir = mod_root / "raw"
+    if not raw_dir.exists():
+        return []
+    return [p for p in raw_dir.rglob("*.scr") if p.is_file()]
+
+def apply_enabled_mods_to_scripts(scripts_dir: Path, default_policy: str = "config_wins"):
+    """
+    default_policy: "config_wins" eller "mod_wins"
+    """
+    scripts_dir = Path(scripts_dir)
+    if not scripts_dir.exists():
+        raise FileNotFoundError(f"Scripts dir not found: {scripts_dir}")
+
+    enabled = get_enabled_mods()
+    if not enabled:
+        return
+
+    for mod_root, manifest in enabled:
+        mod_name = manifest.get("name", mod_root.name)
+
+        # policy per mod (valfritt senare)
+        mod_wins_default = (default_policy == "mod_wins")
+
+        for mod_scr in find_all_mod_scr_files(mod_root):
+            target_name = mod_scr.name
+            out_scr = scripts_dir / target_name
+
+            mod_text = mod_scr.read_text(encoding="utf-8", errors="ignore")
+
+            # Om config redan har filen → merge Param()
+            if out_scr.exists():
+                cfg_text = out_scr.read_text(encoding="utf-8", errors="ignore")
+
+                # här kan du senare läsa per-fil policy ur manifest["priority"][target_name]
+                mod_wins = mod_wins_default
+
+                merged, conflicts = merge_scr(cfg_text, mod_text, mod_wins)
+                out_scr.write_text(merged, encoding="utf-8")
+
+                # (valfritt) logga konflikter för debug
+                if conflicts:
+                    print(f"[MOD MERGE] {mod_name} conflicts in {target_name}: {len(conflicts)}")
+            else:
+                # Config har inte filen → kopiera in den
+                shutil.copy2(mod_scr, out_scr)
+                print(f"[MOD COPY] {mod_name} copied {target_name}")
+
+def find_mod_file(mod_root: Path, filename: str) -> Path | None:
+    raw_dir = mod_root / "raw"
+    if not raw_dir.exists():
+        return None
+    hits = list(raw_dir.rglob(filename))
+    return hits[0] if hits else None
+        
+def load_manifest(mod_root: Path) -> dict | None:
+    p = mod_root / "manifest.json"
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+def save_manifest(mod_root: Path, manifest: dict):
+    p = mod_root / "manifest.json"
+    p.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+def build_installed_mods_ui(parent):
+    frame = tb.Labelframe(parent, text="Installed Mods", padding=6)
+    frame.pack(fill="both", expand=True, pady=(2, 0))
+
+    bottom_container = tb.Frame(frame)
+    bottom_container.pack(fill="x", expand=False, side="bottom")
+    details = tb.Label(bottom_container, text="", justify="left", anchor="w", wraplength=0)
+    details.pack(fill="x", pady=(0, 2))
+
+    btn_row = tb.Frame(bottom_container)
+    btn_row.pack(fill="x")
+    btn_toggle = tb.Button(btn_row, text="Enable/Disable", bootstyle=SECONDARY)
+    btn_toggle.pack(side="left", padx=(0, 8))
+
+    btn_open_folder = tb.Button(btn_row, text="Open Folder", bootstyle=SECONDARY)
+    btn_open_folder.pack(side="left")
+
+    btn_remove = tb.Button(btn_row, text="Remove", bootstyle=DANGER)
+    btn_remove.pack(side="left", padx=(8, 0))
+
+    top_container = tb.Frame(frame)
+    top_container.pack(fill="both", expand=True)
+    lb = tk.Listbox(top_container, height=12)
+    lb.pack(fill="both", expand=True, pady=(0, 4))
+    bind_mousewheel_to_listbox(lb)
+
+    data = {"mods": []}
+
+    def refresh():
+        lb.delete(0, "end")
+        data["mods"] = list_installed_mods()
+
+        for mod_root, manifest in data["mods"]:
+            enabled = manifest.get("enabled", False)
+            name = manifest.get("name", mod_root.name)
+            prefix = "✅ " if enabled else "⛔ "
+            lb.insert("end", prefix + name)
+
+        if data["mods"]:
+            lb.selection_set(0)
+            update_details()
+
+    def get_selected():
+        sel = lb.curselection()
+        return data["mods"][sel[0]] if sel else None
+
+    def update_details(_evt=None):
+        item = get_selected()
+        if not item:
+            details.config(text="")
+            return
+        mod_root, manifest = item
+        name = manifest.get("name", mod_root.name)
+        enabled = manifest.get("enabled", False)
+        scr = manifest.get("scr_files", [])
+        files_count = len(manifest.get("files", []))
+
+        details.config(text=f"{name} | Enabled: {enabled} | Files: {files_count} | SCR: {len(scr)}")
+
+    def toggle_enabled():
+        item = get_selected()
+        if not item:
+            return
+        mod_root, manifest = item
+        manifest["enabled"] = not bool(manifest.get("enabled", False))
+        save_manifest(mod_root, manifest)
+        refresh()
+
+    def open_folder():
+        item = get_selected()
+        if not item:
+            return
+        mod_root, _ = item
+        try:
+            os.startfile(mod_root)
+        except Exception as e:
+            messagebox.showerror("Open folder failed", str(e))
+
+    def remove_selected():
+        item = get_selected()
+        if not item:
+            return
+        mod_root, manifest = item
+        if uninstall_installed_mod(mod_root, manifest):
+            refresh()
+
+    btn_toggle.config(command=toggle_enabled)
+    btn_open_folder.config(command=open_folder)
+    btn_remove.config(command=remove_selected)
+
+    lb.bind("<<ListboxSelect>>", update_details)
+
+    refresh()
+    return frame
+    
+def build_recommended_mods_ui(parent, set_status_cb=None):
+    frame = tb.Labelframe(parent, text="Recommended Nexus Mods", padding=6)
+    frame.pack(fill="both", expand=True, pady=(0, 2))
+
+    # Grid: row 0 = listbox (guaranteed min height), row 1 = details + buttons + deployed list
+    frame.grid_columnconfigure(0, weight=1)
+    frame.grid_rowconfigure(0, weight=1, minsize=120)
+    frame.grid_rowconfigure(1, weight=0, minsize=140)
+
+    lb = tk.Listbox(frame, height=9, exportselection=False)
+    lb.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
+    bind_mousewheel_to_listbox(lb)
+
+    bottom_block = tb.Frame(frame)
+    bottom_block.grid(row=1, column=0, sticky="ew")
+
+    details = tb.Label(bottom_block, text="", anchor="w", wraplength=0)
+    details.pack(fill="x", pady=(0, 2))
+    
+    btn_row = tb.Frame(bottom_block)
+    btn_row.pack(fill="x")
+    btn_files = tb.Button(btn_row, text="Open Files (Slow/Fast)", bootstyle=PRIMARY)
+    btn_files.pack(side="left", padx=(0, 4))
+    
+    btn_smm = tb.Button(btn_row, text="Open Super Mod Merger", bootstyle=SECONDARY)
+    btn_smm.pack(side="left", padx=(8, 0))
+    btn_smm.config(command=lambda: run_super_mod_merger(Path(game_path_var.get().strip())))
+
+    btn_nmm = tb.Button(btn_row, text="Mod Manager Download", bootstyle=SECONDARY)
+    btn_nmm.pack(side="left")
+
+    btn_install = tb.Button(btn_row, text="1. Install Archive (.zip/.rar)", bootstyle=INFO)
+    btn_install.pack(side="left", padx=(8, 0))
+    btn_install.config(command=install_mod_archive_button)
+    
+    btn_deploy = tb.Button(btn_row, text="2. Deploy Enabled Mods", bootstyle="warning-outline")
+    btn_deploy.pack(side="left", padx=(8, 0))
+
+    deployed_lb = tk.Listbox(bottom_block, height=4)
+    deployed_lb.pack(fill="x", expand=False, pady=(4, 0))
+
+    for m in RECOMMENDED_MODS:
+        lb.insert("end", m["name"])
+
+    def get_selected_mod():
+        sel = lb.curselection()
+        return RECOMMENDED_MODS[sel[0]] if sel else None
+
+    def update_ui(_evt=None):
+        m = get_selected_mod()
+        if not m:
+            btn_files.config(state="disabled")
+            btn_nmm.config(state="disabled")
+            details.config(text="")
+            return
+
+        btn_files.config(state="normal")
+        btn_nmm.config(state=("normal" if m.get("file_id") else "disabled"))
+
+        affects = m.get("affects", [])
+        affects_txt = ", ".join(affects) if affects else "—"
+        notes = m.get("notes")
+        notes_txt = f" | Notes: {notes}" if notes else ""
+        url_txt = files_url(m["mod_id"], m.get("file_id"))
+        details.config(text=f"{m['name']} | Affects: {affects_txt}{notes_txt} | {url_txt}")
+
+    def on_files():
+        m = get_selected_mod()
+        if not m:
+            messagebox.showinfo("Select a mod", "Select a mod in the list first.")
+            return
+        open_mod_files(m)
+
+    def on_nmm():
+        m = get_selected_mod()
+        if not m:
+            messagebox.showinfo("Select a mod", "Select a mod in the list first.")
+            return
+        open_mod_manager(m)
+
+    def do_deploy():
+        gp = Path(game_path_var.get().strip())
+        _cb = (set_status_cb[0] if isinstance(set_status_cb, list) else set_status_cb) if set_status_cb else None
+        if str(gp) in ("", "."):
+            if _cb:
+                _cb([(" Select Game Folder first.", "warn")])
+            return
+
+        deployed = deploy_enabled_mod_files(gp)
+
+        deployed_lb.delete(0, "end")
+        for p in deployed:
+            deployed_lb.insert("end", p)
+
+        if _cb:
+            if deployed:
+                _cb([
+                    (" Mods deployed ✔  ", "ok"),
+                    ("Press Apply / Build & Install PAK.", "ok"),
+                ])
+            else:
+                _cb([(" No deployable files found for enabled mods.", "warn")])
+            
+    btn_files.config(command=on_files)
+    btn_nmm.config(command=on_nmm)
+    btn_deploy.config(command=do_deploy)
+
+    lb.bind("<<ListboxSelect>>", update_ui)
+    lb.bind("<Double-Button-1>", lambda e: on_files())
+
+    if lb.size() > 0:
+        lb.selection_set(0)
+    update_ui()
+
+    frame.update_idletasks()
+    return frame
+  
+    # --- Helpers ---
+    
+# ---- Deploy helpers ----
+ASSETS_PC_RE = re.compile(r"^assets_(\d+)_pc$", re.IGNORECASE)   # matchar p.stem
+DATA_PAK_RE  = re.compile(r"^data(\d+)$", re.IGNORECASE)         # matchar p.stem ("data5")
+
+def bind_mousewheel_to_listbox(lb: tk.Listbox):
+    def _on_mousewheel(event):
+        # Windows: event.delta är ±120 per notch
+        lb.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        return "break"  # stoppa att parent scrollar
+
+    # Windows / Mac
+    lb.bind("<MouseWheel>", _on_mousewheel)
+
+    # Linux (om du bryr dig)
+    lb.bind("<Button-4>", lambda e: (lb.yview_scroll(-1, "units"), "break"))
+    lb.bind("<Button-5>", lambda e: (lb.yview_scroll(1, "units"), "break"))
+
+def find_free_slot(dir_path: Path, stem_re: re.Pattern, max_slots: int) -> int | None:
+    used = set()
+    if dir_path.exists():
+        for p in dir_path.iterdir():
+            if p.is_file():
+                m = stem_re.match(p.stem)
+                if m:
+                    used.add(int(m.group(1)))
+    for i in range(1, max_slots + 1):
+        if i not in used:
+            return i
+    return None
+
+def deploy_enabled_mod_files(game_root: Path) -> list[str]:
+    game_root = Path(str(game_root).strip())
+    if str(game_root) in ("", "."):
+        return []
+
+    assets_dir = game_root / "ph_ft" / "work" / "data_platform" / "pc" / "assets"
+    pak_dir    = game_root / "ph_ft" / "source"
+    bin_dir    = game_root / "ph_ft" / "work" / "bin" / "x64"
+
+    # sanity check (tyst) – bara avbryt om fel
+    if not (game_root / "ph_ft").exists():
+        print(f"[DEPLOY] wrong game folder: {game_root}")
+        return []
+
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    pak_dir.mkdir(parents=True, exist_ok=True)
+    bin_dir.mkdir(parents=True, exist_ok=True)
+
+    enabled = get_enabled_mods()
+    if not enabled:
+        return []
+
+    deployed: list[str] = []
+
+    for mod_root, manifest in enabled:
+        raw_dir = mod_root / "raw"
+        mod_name = manifest.get("name", mod_root.name)
+
+        if not raw_dir.exists():
+            print(f"[DEPLOY] missing raw_dir for {mod_name}: {raw_dir}")
+            continue
+
+        for src in raw_dir.rglob("*"):
+            if not src.is_file():
+                continue
+
+            low = src.name.lower()
+
+            try:
+                if low.endswith((".asi", ".dll")):
+                    dest = bin_dir / src.name
+                    shutil.copy2(src, dest)
+                    deployed.append(str(dest))
+                    continue
+
+                if low.endswith(".rpack") and "_pc" in low:
+                    slot = find_free_slot(assets_dir, ASSETS_PC_RE, 5)
+                    if slot is None:
+                        print(f"[DEPLOY] assets slots full: {assets_dir}")
+                        continue
+                    dest = assets_dir / f"assets_{slot}_pc.rpack"
+                    shutil.copy2(src, dest)
+                    deployed.append(str(dest))
+                    continue
+
+                if re.match(r"^data\d+\.pak$", src.name, re.IGNORECASE):
+                    slot = find_free_slot(pak_dir, DATA_PAK_RE, 7)
+                    if slot is None:
+                        print(f"[DEPLOY] pak slots full: {pak_dir}")
+                        continue
+                    dest = pak_dir / f"data{slot}.pak"
+                    shutil.copy2(src, dest)
+                    deployed.append(str(dest))
+                    continue
+
+            except Exception as e:
+                print(f"[DEPLOY] ERROR copying {src} ({mod_name}) -> {e}")
+
+    print(f"[DEPLOY] deployed {len(deployed)} files")
+    return deployed
+    
+def uninstall_installed_mod(mod_root: Path, manifest: dict):
+    name = manifest.get("name", mod_root.name)
+
+    # Säkerhetsfråga
+    if not messagebox.askyesno("Remove mod?", f"Remove '{name}' from Installed Mods?\n\nThis deletes:\n{mod_root}"):
+        return False
+
+    try:
+        shutil.rmtree(mod_root, ignore_errors=False)
+        return True
+    except Exception as e:
+        messagebox.showerror("Remove failed", str(e))
+        return False
+    
+    def get_selected_mod():
+        sel = lb.curselection()
+        if not sel:
+            messagebox.showinfo("Select a mod", "Select a mod in the list first.")
+            return None
+        return RECOMMENDED_MODS[sel[0]]
+        
+       
+    def update_buttons(_evt=None):
+        sel = lb.curselection()
+        if not sel:
+            btn_files.config(state="disabled")
+            btn_nmm.config(state="disabled")
+            details.config(text="")
+            return
+
+        m = RECOMMENDED_MODS[sel[0]]
+
+        btn_files.config(state="normal")
+        btn_nmm.config(state=("normal" if m.get("file_id") else "disabled"))
+
+        affects = m.get("affects", [])
+        affects_txt = ", ".join(affects) if affects else "—"
+
+        notes = m.get("notes")
+        notes_txt = f"\nNotes: {notes}" if notes else ""
+
+        # Länkvisning (valfritt)
+        url_txt = files_url(m["mod_id"], m.get("file_id"))
+
+        details.config(
+            text=f"Affects: {affects_txt}{notes_txt}\nLink: {url_txt}"
+        )
+        
+    def on_files():
+        m = get_selected_mod()
+        if not m:
+            messagebox.showinfo("Select a mod", "Select a mod in the list first.")
+            return
+        open_mod_files(m)
+        
+    def on_nmm():
+        m = get_selected_mod()
+        if not m:
+            messagebox.showinfo("Select a mod", "Select a mod in the list first.")
+            return
+        open_mod_manager(m)
+        
+    btn_files.config(command=on_files)
+    btn_nmm.config(command=on_nmm)
+
+    lb.bind("<<ListboxSelect>>", update_buttons)
+    lb.bind("<Double-Button-1>", lambda e: on_files())
+
+    lb.selection_set(0)
+    update_buttons()
+    
+    return frame
+
+def list_installed_mods() -> list[tuple[Path, dict]]:
+    mods = []
+    if not MODS_DIR.exists():
+        return mods
+    for mod_root in sorted(MODS_DIR.iterdir()):
+        if not mod_root.is_dir():
+            continue
+        m = load_manifest(mod_root)
+        if m:
+            mods.append((mod_root, m))
+    return mods
+    
 # Spawn patches have no effect in game v1.5+
 SPAWNS_SUPPORTED = False
 
+import math
+
+JUMP_HOLD_DEFAULT = 2.76
+JUMP_FURY_DEFAULT = 2.80
+JUMP_ONHEIGHT_DEFAULT = 0.5
+
+FALL_LARGE_DEFAULT   = 6.0
+FALL_HARMFUL_DEFAULT = 8.0
+FALL_LETHAL_DEFAULT  = 12.0
+
+JUMP_SAFE_MAX = 6
+
+MAX_JUMP_MULT = 12.0
+
+JUMP_OVERRIDE_MAX = 90.0  # max 
+
+MAX_JUMP_MULT = 12.0
+JUMP_OVERRIDE_MAX = 90.0
+
+def patch_jump_and_fall_direct(content: str, jump_value: float, override_on: bool) -> str:
+    # clamp till 0..90
+    v = float(jump_value)
+    if v < 0.0:
+        v = 0.0
+    if v > 90.0:
+        v = 90.0
+
+    # Jump: skriv direkt
+    content = _set_param_value(content, "HoldJumpHeight", f"{v:.4f}")
+    content = _set_param_value(content, "FuryHoldJumpHeight", f"{v:.4f}")
+
+    # JumpOnHeight: jump on zombie
+    content = _set_param_value(content, "JumpOnHeight", f"{min(v, 10.0):.4f}")
+
+    # Fall
+    if override_on:
+        content = _set_param_value(content, "LargeFallHeight", "2000.0")
+        content = _set_param_value(content, "HarmfulHeight",   "4000.0")
+        content = _set_param_value(content, "LethalHeight",    "8000.0")
+        content = _set_param_value(content, "FallingHeightToRespawn", "99999")
+
+    return content
+
 # UI colors
-COLOR_OK = "green"
-COLOR_WARN = "red"
+COLOR_OK = "#27be0e"
+COLOR_WARN = "#9f9f9f"
 COLOR_BORDER = "#111111"
+# Card border (Volatiles and other tabs) — use same for background and color so all cards match
+CARD_HIGHLIGHT = "#8A8A8A"
 
 # -----------------------------
 # Game pool constants
@@ -77,16 +1006,95 @@ EXTERIOR_NIGHT_VOLATILE_POOLS = [
 # -----------------------------
 
 
+def enable_dark_titlebar(root):
+    if sys.platform != "win32":
+        return
+    try:
+        root.update_idletasks()
+        hwnd = ctypes.windll.user32.GetParent(root.winfo_id())
+        DWMWA_USE_IMMERSIVE_DARK_MODE = 20  # Win 11/nyare Win10
+        value = ctypes.c_int(1)
+        res = ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_USE_IMMERSIVE_DARK_MODE,
+            ctypes.byref(value),
+            ctypes.sizeof(value),
+        )
+        if res != 0:
+            # fallback för vissa Win10-builds
+            DWMWA_USE_IMMERSIVE_DARK_MODE = 19
+            ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                hwnd,
+                DWMWA_USE_IMMERSIVE_DARK_MODE,
+                ctypes.byref(value),
+                ctypes.sizeof(value),
+            )
+    except Exception:
+        pass
+
+
 def make_scrollable(parent):
-    outer = tk.Frame(parent)
-    canvas = tk.Canvas(outer, highlightthickness=0, borderwidth=0)
-    vsb = tk.Scrollbar(outer, orient="vertical", command=canvas.yview)
+    outer = tb.Frame(parent)
+
+    # Canvas i dark theme (tk.Canvas kan stylas med bg)
+    canvas = tk.Canvas(
+        outer,
+        highlightthickness=0,
+        borderwidth=0,
+        bg=outer.winfo_toplevel().cget("background"),  # matcha theme-bg
+    )
+
+    # Bootstrap scrollbar (inte tk.Scrollbar)
+    vsb = tb.Scrollbar(outer, orient="vertical", command=canvas.yview, bootstyle="dark-round")
     canvas.configure(yscrollcommand=vsb.set)
 
     vsb.pack(side="right", fill="y")
     canvas.pack(side="left", fill="both", expand=True)
 
-    inner = tk.Frame(canvas)
+    inner = tb.Frame(canvas)  # inner får theme
+    window_id = canvas.create_window((0, 0), window=inner, anchor="nw")
+
+    def _on_inner_configure(_event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def _on_canvas_configure(event):
+        canvas.itemconfigure(window_id, width=event.width)
+
+    inner.bind("<Configure>", _on_inner_configure)
+    canvas.bind("<Configure>", _on_canvas_configure)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    # Windows + Touchpad:
+    canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    def _bind(_e=None):
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    def _unbind(_e=None):
+        canvas.unbind_all("<MouseWheel>")
+
+    canvas.bind("<Enter>", _bind)
+    canvas.bind("<Leave>", _unbind)
+
+    return outer, inner
+
+
+def create_scrollable_frame(parent):
+    """Canvas + vertical Scrollbar + inner Frame; mouse wheel scrolls when cursor over canvas. Returns (outer, inner)."""
+    outer = tb.Frame(parent)
+    canvas = tk.Canvas(
+        outer,
+        highlightthickness=0,
+        borderwidth=0,
+        bg=outer.winfo_toplevel().cget("background"),
+    )
+    vsb = tb.Scrollbar(outer, orient="vertical", command=canvas.yview, bootstyle="dark-round")
+    canvas.configure(yscrollcommand=vsb.set)
+    vsb.pack(side="right", fill="y")
+    canvas.pack(side="left", fill="both", expand=True)
+    inner = tb.Frame(canvas)
     window_id = canvas.create_window((0, 0), window=inner, anchor="nw")
 
     def _on_inner_configure(_event):
@@ -162,23 +1170,58 @@ def _fuel_color_bar_row(
     update_bar()
     return row
     
-def red_callout(parent, padx=8, pady=8):
+def pick_scale(ret):
+    if hasattr(ret, "config"):
+        return ret
+    if isinstance(ret, tuple):
+        for item in ret:
+            if hasattr(item, "config"):
+                return item
+    raise TypeError("ui_labeled_slider() did not return a Scale-like widget")
+    
+def find_scale(obj):
+    """Returnerar första tk.Scale/ttk.Scale den hittar i obj (tuple/list/widget)."""
+    # Direkt scale?
+    if isinstance(obj, (tk.Scale, ttk.Scale)):
+        return obj
+
+    # Widget-container? (Frame etc) -> kolla barn
+    if isinstance(obj, tk.Widget):
+        for child in obj.winfo_children():
+            sc = find_scale(child)
+            if sc is not None:
+                return sc
+        return None
+
+    # Tuple/list -> gå igenom
+    if isinstance(obj, (tuple, list)):
+        for item in obj:
+            sc = find_scale(item)
+            if sc is not None:
+                return sc
+        return None
+
+    return None
+    
+def red_callout(parent, padx=0, pady=0):
     """Returns (box_frame, inner_frame). box_frame has the red border; reconfigure it when path is set."""
     box = tk.Frame(parent, highlightthickness=2, highlightbackground="#d00000")
-    box.pack(fill="x", padx=10, pady=10)  # yttre marginal
+    box.pack(side="left", padx=0, pady=0)   
     inner = tk.Frame(box)
-    inner.pack(fill="x", padx=padx, pady=pady)  # luft INUTI den röda rutan
+    inner.pack(padx=padx, pady=pady)        
     return box, inner
   
 def resource_path(rel_path: str) -> str:
-    """
-    Funkar både när du kör .py och när du kör PyInstaller exe.
-    """
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        base = Path(sys._MEIPASS)  # temp-extract för onefile
+    # If PyInstaller onefile: sys._MEIPASS points to temp extraction dir
+    if getattr(sys, "frozen", False):
+        base_dir = os.path.dirname(sys.executable)   # works for onedir
+        mei_dir = getattr(sys, "_MEIPASS", None)     # exists for onefile
+        if mei_dir:
+            base_dir = mei_dir
     else:
-        base = Path(__file__).resolve().parent
-    return str(base / rel_path)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(base_dir, rel_path)
 
 def config_dir() -> Path:
     base = Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local")))
@@ -307,8 +1350,6 @@ def ui_keybind_row(parent, label_text: str, var: tk.StringVar, hint: str = ""):
 
     return row
 
-
-    
 def keysym_to_friendly(keysym: str) -> str:
     k = (keysym or "").strip()
 
@@ -538,6 +1579,7 @@ def add_banner(parent, image_path, height=160):
 
     lbl = tk.Label(banner_frame, bd=0)
     lbl.pack(fill="x")
+
 
     def _redraw(_event=None):
         w = banner_frame.winfo_width()
@@ -816,6 +1858,17 @@ def patch_addaction_device_and_key(action_name: str, token: str):
         )
 
     return _patch
+    
+def patch_jump_heights(content: str, boost_slider_value: float) -> str:
+    # 0 => 1.0x, 10 => 10.0x
+    mult = 1.0 + (6.0 * (boost_slider_value / 10.0))
+
+    hold = JUMP_HOLD_DEFAULT * mult
+    fury = JUMP_FURY_DEFAULT * mult
+
+    content = _set_param_value(content, "HoldJumpHeight", f"{hold:.4f}")
+    content = _set_param_value(content, "FuryHoldJumpHeight", f"{fury:.4f}")
+    return content
 
 
 def patch_paramfloat_mul(name: str, mul: float) -> Patcher:
@@ -1708,22 +2761,19 @@ def patch_hunger_buckets(
 
     return _patch
 
-
-def write_from_template(
-    template_path: str, out_path: str, patchers: List[Patcher]
-) -> None:
-    if not os.path.exists(template_path):
-        raise Exception(f"Template not found: {template_path}")
+def write_from_template(template_rel_path: str, out_path: str, patchers):
+    template_path = resource_path(template_rel_path)  # <-- VIKTIGT
 
     with open(template_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    content = apply_patchers(content, patchers)
+    for p in patchers:
+        content = p(content)
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(content)
 
+    with open(out_path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(content)
 
 def _fmt_num(x: float) -> str:
     s = f"{x:.6f}".rstrip("0").rstrip(".")
@@ -2975,6 +4025,32 @@ def patch_common_dynamic_spawn_logic(
 # -----------------------------
 # 4) Build/install pipeline
 # -----------------------------
+def apply_enabled_mods_to_scripts(out_scripts_dir: Path):
+    enabled = get_enabled_mods()
+    if not enabled:
+        return
+
+    for mod_root, manifest in enabled:
+        # exempel: merge player_variables.scr om den finns
+        target_name = "player_variables.scr"
+        mod_file = find_mod_file(mod_root, target_name)
+        out_file = out_scripts_dir / target_name
+
+        if mod_file and out_file.exists():
+            config_text = out_file.read_text(encoding="utf-8", errors="ignore")
+            mod_text = mod_file.read_text(encoding="utf-8", errors="ignore")
+
+            # policy: fråga? eller default config_wins?
+            # börja enkelt: config wins som default
+            mod_wins = False
+
+            merged, conflicts = merge_scr(config_text, mod_text, mod_wins)
+            if conflicts:
+                # här kan du senare popup + remember choice i manifest["priority"][target_name]
+                pass
+
+            out_file.write_text(merged, encoding="utf-8")
+
 def build_pak(pak_name=PAK_NAME):
     ensure_dirs()
     pak_path = os.path.join(OUTPUT_DIR, pak_name)
@@ -3006,9 +4082,8 @@ def install_pak(game_path: str, pak_name=PAK_NAME):
 # -----------------------------
 # 5) UI state (tk variables)
 # -----------------------------
-root = tk.Tk()
-root.title("DLTB Configurator by Robeloto v0.5b")
-root.geometry("700x870")
+
+enable_dark_titlebar(root)
 
 # --- defaults per group ---
 DEFAULTS_XP = []
@@ -3320,28 +4395,24 @@ def ui_labeled_slider(
     from_,
     to,
     hint=None,
-    font_title=("Arial", 10, "bold"),
+    font_title=("Arial", 10),
     resolution=1,
     tight=True,
     label_width=24,
     entry_width=6,
     invert_negative=False,
+    slider_length=420,      # <-- styr hur lång du vill ha den
 ):
-    """
-    invert_negative: when True and from_ < 0, slider displays 0 to abs(from_) left-to-right
-    but var stores -abs(from_) to 0. E.g. resting cost: slider 0..400, var -400..0.
-    """
     row_pady = 2 if tight else 4
     row = tk.Frame(parent)
     row.pack(fill="x", pady=(0, row_pady))
 
     if title:
-        tk.Label(row, text=title, font=font_title, width=label_width, anchor="w").pack(
-            side="left"
-        )
+        tk.Label(row, text=title, font=font_title, width=label_width, anchor="w").pack(side="left")
 
     scale_var = var
     scale_from, scale_to = from_, to
+
     if invert_negative and from_ < 0 and to <= 0:
         scale_from = 0
         scale_to = abs(float(from_))
@@ -3377,20 +4448,21 @@ def ui_labeled_slider(
         to=scale_to,
         orient="horizontal",
         variable=scale_var,
-        showvalue=0,
+        showvalue=1,
         resolution=resolution,
+        length=slider_length,
     )
-    scale.pack(side="left", fill="x", expand=True, padx=(4, 2))
+    # INTE fill/expand här, annars blir den avlång igen
+    scale.pack(side="left", padx=(4, 2))
 
     entry = tk.Entry(row, width=entry_width, textvariable=var)
     entry.pack(side="left")
 
     if hint:
-        tk.Label(parent, text=hint, fg="#666666", font=("Arial", 8)).pack(
-            fill="x", pady=(0, 1)
-        )
+        tk.Label(parent, text=hint, fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 1))
 
     return row, scale, entry
+
 
 
 def ui_pick_color_btn(parent, text, r_var, g_var, b_var):
@@ -3413,6 +4485,20 @@ def ui_section_title(parent, text, *, font=("Arial", 10, "bold"), pady=(0, 5)):
 def ui_hint(parent, text, *, fg="#666666", pady=(0, 6)):
     """Small gray helper text."""
     tk.Label(parent, text=text, fg=fg).pack(fill="x", pady=pady)
+
+
+# Two-column grid layout: use for slider groups to reduce vertical length.
+# Caller creates cell = tk.Frame(grid_frame) per item and cell.grid(row=i//2, column=i%2, sticky="ew", padx=..., pady=...).
+GRID_COL_PADX = (0, 8)
+GRID_ROW_PADY = (0, 2)
+
+
+def make_two_column_grid(parent):
+    """Returns a frame with 2 equal-weight columns. Pack this frame, then grid children at (i//2, i%2)."""
+    f = tk.Frame(parent)
+    f.columnconfigure(0, weight=1)
+    f.columnconfigure(1, weight=1)
+    return f
 
 
 def ui_slider_row(parent, var, *, from_, to, showvalue=0, entry_width=6, pady=(0, 4)):
@@ -3521,28 +4607,172 @@ def ui_header(parent, title, subtitle=None, subtitle2=None):
     tk.Frame(header, height=1, bg="#D0D0D0").pack(fill="x", padx=20, pady=(6, 0))
 
     return header
+    
+def load_icon(path, size=18):
+    img = Image.open(path).convert("RGBA").resize((size, size), Image.LANCZOS)
+    return ImageTk.PhotoImage(img)
 
+# efter root skapats:
+icons = {
+    "Main": load_icon(resource_path("assets/home.png"), size=30),
+    "XP": load_icon(resource_path("assets/xp.png"), size=30),
+    "Enemies": load_icon(resource_path("assets/skull.png"), size=30),
+    "Flashlight": load_icon(resource_path("assets/uv.png"), size=30),
+    "Hunger": load_icon(resource_path("assets/food.png"), size=30),
+    "Player": load_icon(resource_path("assets/player.png"), size=30),
+    "Vehicles": load_icon(resource_path("assets/car.png"), size=30),
+    "Volatiles": load_icon(resource_path("assets/volatile.png"), size=30),
+    "Mods": load_icon(resource_path("assets/mods.png"), size=30),
+}
+root._tab_icons = icons  # keep references (otherwise GC)
+    
+def set_window_icon(root, icon_path: str):
+    icon_path = str(icon_path)
+
+    # Om du har .ico: detta är stabilast på Windows
+    if icon_path.lower().endswith(".ico"):
+        try:
+            root.iconbitmap(icon_path)
+            return
+        except Exception:
+            pass  # fall back till iconphoto nedan
+
+    img = Image.open(icon_path).convert("RGBA")
+
+    sizes = [16, 32, 48, 64, 128]  # räcker
+    window_icons = []
+    for s in sizes:
+        im = img.resize((s, s), Image.LANCZOS)
+        window_icons.append(ImageTk.PhotoImage(im, master=root))  # <-- VIKTIGT: master=root
+
+    root.iconphoto(True, *window_icons)
+    root._window_icon_refs = window_icons  # <-- VIKTIGT: behåll refs
 
 def build_ui():
-    # Pack bottom bar first so it reserves space and stays visible
+    ui = {}  #
+    
+    # Bottom bar (keep)
     bottom = tk.Frame(root)
     bottom.pack(side="bottom", fill="x", padx=5, pady=(2, 2))
 
-    notebook = ttk.Notebook(root, style="NoFocus.TNotebook")
-    notebook.pack(fill="both", expand=True)
-    btn_load_preset = None
-    btn_save_preset = None
+    # TOP toolbar: pure tk, topbar takes focus so button never keeps it; force colors so theme can't override
+    TOPBAR_BG = "#2b3038"
+    topbar = tk.Frame(root, bg=TOPBAR_BG)
+    topbar.configure(takefocus=1)
+    topbar.pack(side="top", fill="x", padx=4, pady=4)
+    pad_tb = dict(padx=4, pady=4)
 
+    BTN_NORMAL = "#343a44"
+    BTN_HOVER = "#363c46"
+    FG = "#eaeaea"
+
+    root.option_add("*Button.background", BTN_NORMAL)
+    root.option_add("*Button.foreground", FG)
+    root.option_add("*Button.activeBackground", BTN_NORMAL)
+    root.option_add("*Button.activeForeground", FG)
+        
+    def make_toolbar_button(parent, text, command=None):
+        safe_cmd = command if callable(command) else (lambda: None)
+        b = tk.Button(
+            parent,
+            text=text,
+            command=safe_cmd,
+            relief="flat",
+            bd=0,
+            highlightthickness=0,
+            takefocus=0,
+            bg=BTN_NORMAL,
+            fg=FG,
+            font=("Segoe UI", 9),
+            activebackground=BTN_NORMAL,
+            activeforeground=FG,
+            highlightbackground=BTN_NORMAL,
+            highlightcolor=BTN_NORMAL,
+            padx=4,
+            pady=2,
+            cursor="hand2",
+        )
+
+        def set_normal(_=None):
+            try:
+                b.configure(bg=BTN_NORMAL, activebackground=BTN_NORMAL, fg=FG, activeforeground=FG)
+            except tk.TclError:
+                pass
+
+        def set_hover(_=None):
+            try:
+                b.configure(bg=BTN_HOVER, activebackground=BTN_HOVER, fg=FG, activeforeground=FG)
+            except tk.TclError:
+                pass
+
+        b.bind("<Enter>", set_hover)
+        b.bind("<Leave>", set_normal)
+        b.bind("<FocusOut>", set_normal)
+
+        def on_release(_=None):
+            set_normal()
+            try:
+                parent.focus_set()
+            except tk.TclError:
+                pass
+            b.after(10, set_normal)
+            b.after(50, set_normal)
+
+        b.bind("<ButtonRelease-1>", on_release)
+        b.bind("<Map>", lambda e: b.after(1, set_normal))
+
+        for delay in (10, 50, 150, 300):
+            b.after(delay, set_normal)
+
+        return b
+
+
+    # Notebook below topbar
+    notebook = tb.Notebook(root, bootstyle="dark")
+    # .ico ger rätt ikon i Windows (taskbar, titel, alt-tab); PNG som fallback
+    ico_path = resource_path("assets/app.ico")
+    if os.path.isfile(ico_path):
+        set_window_icon(root, ico_path)
+    else:
+        set_window_icon(root, resource_path("assets/dltb_icon.png"))
+    notebook.pack(fill="both", expand=True)
+    
     # ---- Tabs  ----
+    main_tab = tk.Frame(notebook)
     xp_tab = tk.Frame(notebook)
     flashlight_tab = tk.Frame(notebook)
     hunger_tab = tk.Frame(notebook)
-    night_tab = tk.Frame(notebook)
     player_tab = tk.Frame(notebook)
     vehicles_tab = tk.Frame(notebook)
     volatiles_tab = ttk.Frame(notebook)
     enemies_tab = tk.Frame(notebook)
+    mods_tab = tb.Frame(notebook)
 
+    # --- Mods tab ---
+    for child in mods_tab.winfo_children():
+        child.destroy()
+
+    # MÅSTE komma före att du använder en_adv_scroll_inner
+    en_adv_scroll_outer, en_adv_scroll_inner = create_scrollable_frame(mods_tab)
+    en_adv_scroll_outer.pack(fill="both", expand=True)
+
+    pw = tk.PanedWindow(en_adv_scroll_inner, orient="vertical")
+    pw.pack(fill="both", expand=True)
+
+    rec_container = tb.Frame(pw)
+    inst_container = tb.Frame(pw)
+
+    pw.add(rec_container, minsize=360)
+    pw.add(inst_container, minsize=180)
+
+    # Status bar is created later; pass a ref so mods tab can use it once set
+    ui["_set_status_ref"] = [None]
+    build_recommended_mods_ui(rec_container, set_status_cb=ui["_set_status_ref"])
+    build_installed_mods_ui(inst_container)
+
+    mods_tab.update_idletasks()
+    mods_tab.after(0, lambda: pw.sash_place(0, 0, 320))
+    
     # --- Volatiles vars ---
     set_default(DEFAULTS_VO, vo_reduce_pct_var, 100)
     
@@ -3560,8 +4790,6 @@ def build_ui():
         save_save_path_txt(p)  # <-- viktigt
         messagebox.showinfo("Save path set", f"Save path set to:\n{p}")
 
-
-
     def _guess_steam_roots() -> list[Path]:
         roots = [
             Path(r"C:\Program Files (x86)\Steam"),
@@ -3569,7 +4797,7 @@ def build_ui():
             Path.home() / "AppData" / "Local" / "Steam",
         ]
         return [p for p in roots if (p / "userdata").exists()]
-
+    
     def auto_find_save_path():
         candidates: list[Path] = []
 
@@ -3657,101 +4885,76 @@ def build_ui():
 }
     fuel_usage_pct = tk.IntVar(value=100)
     fuel_max_pct = tk.IntVar(value=100)
-    notebook.add(xp_tab, text="XP")
-    notebook.add(enemies_tab, text="Enemies")
-    notebook.add(flashlight_tab, text="Flashlight")
+    notebook.add(main_tab, text="Main", image=icons["Main"], compound="left")
+    notebook.add(xp_tab, text="XP", image=icons["XP"], compound="left")
+    notebook.add(enemies_tab, text="Enemies", image=icons["Enemies"], compound="left")
+    notebook.add(flashlight_tab, text="Flashlight", image=icons["Flashlight"], compound="left")
+    notebook.add(hunger_tab, text="Hunger", image=icons["Hunger"], compound="left")
+    notebook.add(player_tab, text="Player", image=icons["Player"], compound="left")
+    notebook.add(vehicles_tab, text="Vehicles", image=icons["Vehicles"], compound="left")
+    notebook.add(volatiles_tab, text="Volatiles", image=icons["Volatiles"], compound="left")
+    notebook.add(mods_tab, text="Mods", image=icons["Mods"], compound="left")
 
-    notebook.add(hunger_tab, text="Hunger")
-    notebook.add(night_tab, text="Chase limit")
-    notebook.add(player_tab, text="Player")
-    notebook.add(vehicles_tab, text="Vehicles")
-    notebook.add(volatiles_tab, text="Volatiles")
+    # ---- Top toolbar (real tk.Button, flat, hover never stuck) ----
+    pad_tb = dict(padx=4, pady=4)
 
-    style = ttk.Style()
-    style.theme_use("vista")
+    btn_load_preset = make_toolbar_button(topbar, "Load preset…", command=None)
+    btn_load_preset.pack(side="left", **pad_tb)
+    btn_save_preset = make_toolbar_button(topbar, "Save preset…", command=None)
+    btn_save_preset.pack(side="left", **pad_tb)
+    sep1 = tk.Frame(topbar, width=2, bg="#555555")
+    sep1.pack(side="left", fill="y", padx=6, pady=6)
 
-    # "
-    style.layout(
-        "NoFocus.TNotebook.Tab",
-        [
-            (
-                "Notebook.tab",
-                {
-                    "sticky": "nswe",
-                    "children": [
-                        (
-                            "Notebook.padding",
-                            {
-                                "sticky": "nswe",
-                                "children": [("Notebook.label", {"sticky": "nswe"})],
-                            },
-                        )
-                    ],
-                },
-            )
-        ],
-    )
-
-    style.configure(
-        "NoFocus.TNotebook.Tab",
-        padding=(12, 5),
-        font=("Arial", 8, "bold"),
-    )
-
-    # ---- Bottom bar content (bottom frame already packed above) ----
-    # Save path row: centered above the main button row
-    # Row 1: save path buttons (centered)
-    save_path_wrapper = tk.Frame(bottom)
-    save_path_wrapper.pack(fill="x", pady=(0, 10))  # <-- LUFT UNDER RAD 1
-
-    tk.Frame(save_path_wrapper).pack(side="left", fill="x", expand=True)
-
-    save_path_callout_box = tk.Frame(save_path_wrapper, highlightthickness=2, highlightbackground="#d00000")
-    save_path_callout_box.pack(side="left", padx=10, pady=10)
+    # Save path group (red border)
+    save_path_callout_box = tk.Frame(topbar, highlightthickness=2, highlightbackground="#d00000")
+    save_path_callout_box.pack(side="left", **pad_tb)
     save_path_callout_inner = tk.Frame(save_path_callout_box)
-    save_path_callout_inner.pack(fill="x", padx=8, pady=8)
-    save_path_callout_label = tk.Label(
-        save_path_callout_inner,
-        text="Choose save folder for backups!",
-        fg="#d00000",
-        font=("Arial", 9, "bold"),
-        anchor="center",
-    )
-    save_path_callout_label.pack(fill="x", pady=(0, 4))
+    save_path_callout_inner.pack(fill="x", padx=4, pady=2)
     save_path_row = tk.Frame(save_path_callout_inner)
     save_path_row.pack(fill="x")
-    save_path_check_label = tk.Label(save_path_row, text="✓", fg="#228b22", font=("Arial", 12, "bold"))
+    save_path_check_label = tk.Label(save_path_row, text="✓", fg="#228b22", font=("Arial", 8, "bold"))
     save_path_check_label.pack(side="left", padx=(0, 8))
     save_path_check_label.pack_forget()
-    btn_auto = tk.Button(save_path_row, text="Auto-find save path", command=auto_find_save_path)
-    btn_auto.pack(side="left", padx=(0, 6), ipady=2)
-    btn_manual = tk.Button(save_path_row, text="Manual save path...", command=manual_pick_save_path)
-    btn_manual.pack(side="left", ipady=2)
+    btn_save_auto = make_toolbar_button(save_path_row, "Auto-find save path", command=auto_find_save_path)
+    btn_save_auto.pack(side="left", padx=(0, 6), pady=0)
+    btn_manual = make_toolbar_button(save_path_row, "Manual save path...", command=manual_pick_save_path)
+    btn_manual.pack(side="left", pady=0)
 
-    tk.Frame(save_path_wrapper).pack(side="left", fill="x", expand=True)
+    sep2 = tk.Frame(topbar, width=2, bg="#555555")
+    sep2.pack(side="left", fill="y", padx=6, pady=6)
 
+    # Game folder group (red border)
+    callout_box, callout = red_callout(topbar)
+    combined_btn_row = tk.Frame(callout)
+    combined_btn_row.pack(anchor="w", pady=0)
+    btn_auto = make_toolbar_button(combined_btn_row, "Auto-detect Game Folder", command=None)
+    btn_auto.pack(side="left", padx=(0, 6))
+    btn_select = make_toolbar_button(combined_btn_row, "Select Game Folder", command=None)
+    btn_select.pack(side="left", padx=(0, 6))
+
+    root.option_add("*Button.background", "SystemButtonFace")
+    root.option_add("*Button.foreground", "SystemButtonText")
+    root.option_add("*Button.activeBackground", "SystemButtonHighlight")
+    root.option_add("*Button.activeForeground", "SystemButtonText")
+
+    # ---- Bottom bar: Apply / Build / Play + status ----
     btn_row = tk.Frame(bottom)
     btn_row.pack()
+
     btn_apply = tk.Button(btn_row, text="Apply", state="disabled")
-    btn_apply.pack(side="left", padx=0)
-
-    btn_load_preset = tk.Button(btn_row, text="Load preset…")
-    btn_load_preset.pack(side="left", padx=(18, 6))
-
-    btn_save_preset = tk.Button(btn_row, text="Save preset…")
-    btn_save_preset.pack(side="left", padx=6)
+    btn_apply.pack(side="left", padx=8)
 
     btn_build = tk.Button(btn_row, text="Build & Install PAK", state="disabled")
-    btn_build.pack(side="left", padx=6)
+    btn_build.pack(side="left", padx=8)
     
     btn_launch = tk.Button(
         btn_row,
         text="▶  PLAY GAME",
         command=launch_dying_light,
-        bg="#39b54a",           # steam-ish green
-        fg="white",
-        activebackground="#2fa043",
-        activeforeground="white",
+        bg="#90EE90",           # light green
+        fg="black",
+        activebackground="#90EE90",
+        activeforeground="black",
         bd=0,
         relief="flat",
         font=("Arial", 10, "bold"),
@@ -3760,7 +4963,6 @@ def build_ui():
         cursor="hand2",
     )
     btn_launch.pack(side="left", padx=6)
-
 
     status_frame = tk.Frame(bottom)
     status_frame.pack(fill="x", pady=(8, 0))
@@ -3773,267 +4975,353 @@ def build_ui():
     status_text.tag_configure("warn", foreground=COLOR_WARN)
     status_text.config(state="disabled", cursor="arrow")
     
-    xp_header = ui_header(
-        xp_tab,
-        "Dying Light: The Beast Configurator",
-        "by Robeloto • a Mod tool for XP, Flashlight, Hunger, Volatiles and more",
-        "Workflow: Choose mode → Tune sliders → Build & Install PAK",
-    )
+    def set_status(items):
+        # items: [("text", "ok"), ("text", "warn")] eller bara "text"
+        if isinstance(items, str):
+            items = [(items, "ok")]
 
-    # EN wrapper
-    xp_wrapper = tk.Frame(xp_tab)
-    xp_wrapper.pack(fill="both", expand=True)
+        status_text.config(state="normal")
+        status_text.delete("1.0", "end")
+        for text, tag in items:
+            status_text.insert("end", str(text), tag)
+        status_text.config(state="disabled")
 
-    # Banner
-    xp_banner_frame = add_banner(xp_wrapper, "dltb.jpg", height=160)
-
-    # resten av XP UI under bannern
-    choose_mode_frame = tk.Frame(xp_wrapper)
-    choose_mode_frame.pack(fill="x", pady=(0, 0))
-
-    # Badge
-    xp_badge = tk.Frame(
-        choose_mode_frame,
-        highlightbackground="#8A8A8A",
-        highlightthickness=2,
-        bd=0,
-    )
-    xp_badge.pack(pady=(10, 10))
-
-    tk.Label(
-        xp_badge,
-        text="Choose XP Mode",
-        font=("Arial", 13, "bold"),
-        padx=14,
-        pady=5,
-    ).pack()
-
-    # Card centered
-    xp_card = tk.Frame(choose_mode_frame, highlightthickness=1, highlightbackground="#CFCFCF")
-    xp_card.pack(fill="x", padx=50)
-
-
-    btn_reset_fl = None
-
-    # RÖD CALLOUT runt game-folder knapparna (box = border, callout = inner; update from refresh_buttons when path ok)
-    callout_box, callout = red_callout(xp_card)
-    callout_game_path_label = tk.Label(
-        callout,
-        text="IMPORTANT: Set game folder first",
-        fg="#d00000",
-        font=("Arial", 9, "bold"),
-    )
-    callout_game_path_label.pack(fill="x", pady=(0, 6), anchor="center")
-
-    folder_row = tk.Frame(callout)
-    folder_row.pack(fill="x", pady=(0, 0))
-
-    # vänster spacer
-    tk.Frame(folder_row).pack(side="left", expand=True, fill="x")
-
-    btn_auto = tk.Button(folder_row, text="Auto-detect Game Folder")
-    btn_auto.pack(side="left", padx=3)
-
-    btn_select = tk.Button(folder_row, text="Select Game Folder")
-    btn_select.pack(side="left", padx=3)
-
-    # höger spacer
-    tk.Frame(folder_row).pack(side="left", expand=True, fill="x")
-
-
-
-    radio_frame = tk.Frame(xp_card)
-    radio_frame.pack(pady=(2, 4))
-
-    rb_font = ("Arial", 11)
-
-    rb_ow = tk.Radiobutton(
-        radio_frame,
-        text="Open World XP (pre-NG+)",
-        variable=mode,
-        value="openworld",
-        font=rb_font,
-        pady=4,
-    )
-    rb_ow.pack(anchor="w")
-
-    rb_leg = tk.Radiobutton(
-        radio_frame,
-        text="Legend XP Bonus (NG+)",
-        variable=mode,
-        value="legend",
-        font=rb_font,
-        pady=4,
-    )
-    rb_leg.pack(anchor="w")
-
-    xp_reset_row = tk.Frame(xp_card)
-    xp_reset_row.pack(fill="x", padx=10, pady=(6, 0))
-
-    btn_reset_xp = tk.Button(xp_reset_row, text="Reset everything to defaults")
-    btn_reset_xp.pack()
-
-    # ---- Content frames (inside XP tab) ----
-    openworld_frame = tk.Frame(xp_card)
-    legend_frame = tk.Frame(xp_card)
-    legend_scroll_outer, legend_scroll_inner = make_scrollable(legend_frame)
-    legend_scroll_outer.pack(fill="both", expand=True)
-    for w in legend_scroll_outer.winfo_children():
-        if isinstance(w, tk.Canvas):
-            w.configure(height=320)
-            break
-
-    # --- Open World sliders ---
-    tk.Label(
-        openworld_frame,
-        text="Open World XP Multiplier",
-        font=("Arial", 11, "bold"),
-    ).pack(fill="x", pady=(0, 2))   # fill="x"
-    ui_labeled_slider(
-        openworld_frame,
-        "",
-        openworld_var,
-        from_=1.0,
-        to=100.0,
-        hint="(1 = vanilla)",
-        font_title=("Arial", 11, "bold"),
-        resolution=1.0,
-    )
-
-    # Legend header (compact, inside scroll)
-    TEXT = "#1A1A1A"
-    BG = "#D9C06A"
-    legend_header = tk.Frame(
-        legend_scroll_inner, bg=BG, highlightbackground=COLOR_BORDER, highlightthickness=1
-    )
-    legend_header.pack(fill="x", pady=(0, 1))
-
-    tk.Label(
-        legend_header,
-        text="Legend XP Multipliers",
-        font=("Arial", 9, "bold"),
-        fg=TEXT,
-        bg=BG,
-        pady=1,
-    ).pack(fill="x")
-
-    # Legend multipliers (compact)
-    legend_easy_var.set(1.0)
-    legend_hard_var.set(1.05)
-    legend_nightmare_var.set(1.15)
-
-    ui_labeled_slider(
-        legend_scroll_inner,
-        "Easy / Normal",
-        legend_easy_var,
-        from_=1.0,
-        to=300.0,
-        resolution=0.01,
-        tight=True,
-    )
-
-    ui_labeled_slider(
-        legend_scroll_inner,
-        "Hard",
-        legend_hard_var,
-        from_=1.0,
-        to=300.0,
-        resolution=0.01,
-        tight=True,
-    )
-
-    ui_labeled_slider(
-        legend_scroll_inner,
-        "Nightmare",
-        legend_nightmare_var,
-        from_=1.0,
-        to=300.0,
-        resolution=0.01,
-        tight=True,
-    )
-
-    # --- Legend (always visible parts) ---
-    ui_labeled_slider(
-        legend_scroll_inner,
-        "Legend XP Loss on Death(%)",
-        ll_xp_loss_var,
-        from_=0,
-        to=500,
-        hint="(0 = no XP loss, 100 = vanilla)",
-        resolution=1.0,
-        tight=True,
-    )
-
-    # --- Advanced toggle (bottom of legend section) ---
-    advanced_row = tk.Frame(legend_scroll_inner)
-    advanced_row.pack(fill="x", pady=(0, 0))
-
-    center = tk.Frame(advanced_row)
-    center.pack()
-
-    advanced_frame = tk.Frame(legend_scroll_inner)  # DO NOT pack here yet
-
-    def refresh_advanced():
-        if advanced_var.get():
-            advanced_frame.pack(fill="x", pady=(0, 0))
-            xp_banner_frame.pack_forget()
-        else:
-            advanced_frame.pack_forget()
-            xp_banner_frame.pack(fill="x", pady=(6, 10))
-
-    tk.Checkbutton(
-        center,
-        text="Advanced settings",
-        variable=advanced_var,
-        command=refresh_advanced,
-    ).pack()
-
-    ui_labeled_slider(
-        advanced_frame,
-        "Legend Penalty multiplier",
-        legend_penalty_var,
-        from_=0.0,
-        to=5.0,
-        hint="(1.0 = vanilla-ish baseline)",
-        resolution=0.05,
-        tight=True,
-    )
-
-    ui_labeled_slider(
-        advanced_frame,
-        "NG+ Bonus multiplier",
-        ngplus_var,
-        from_=0.0,
-        to=5.0,
-        hint="(1.5 = vanilla)",
-        resolution=0.05,
-        tight=True,
-    )
-
-    ui_labeled_slider(
-        advanced_frame,
-        "Coop Bonus multiplier",
-        coop_var,
-        from_=0.0,
-        to=5.0,
-        hint="(1.0 = vanilla)",
-        resolution=0.05,
-        tight=True,
-    )
-
-    ui_labeled_slider(
-        advanced_frame,
-        "Quest Legend multiplier",
-        quest_lp_var,
-        from_=1.0,
-        to=10.0,
-        hint="(1.0 = vanilla)",
-        resolution=0.05,
-        tight=True,
-    )
-
-    refresh_advanced()
+    ui["set_status"] = set_status
+    ui["status_text"] = status_text  
+    if "_set_status_ref" in ui:
+        ui["_set_status_ref"][0] = set_status
+        
+    global STATUS_REF
+    STATUS_REF[0] = set_status
     
+    btn_reset_fl = None
+    
+    jump_override_var = tk.BooleanVar(value=False)
+    jump_boost_var = tk.DoubleVar(value=0.0)
+    
+    ui["jump_boost_var"] = jump_boost_var
+    ui["jump_override_var"] = jump_override_var
+    
+    def build_main_tab(parent):
+        """Main tab: banner, title, game path + save path only. No XP controls."""
+        ui_header(
+            parent,
+            "Dying Light: The Beast Configurator",
+            "by Robeloto • a Mod tool for XP, Flashlight, Hunger, Volatiles and more",
+        )
+
+        main_wrapper = tk.Frame(parent)
+        main_wrapper.pack(fill="both", expand=True)
+
+        # Banner
+        xp_banner_frame = add_banner(main_wrapper, "dltb.jpg", height=160)
+        
+        hdr = tb.Label(
+            main_wrapper,
+            text="Workflow: Choose mode → Tune sliders → Build & Install PAK.\n\nWelcome to Version 0.6b",
+            font=("Arial", 10),
+            bootstyle="info",
+            justify="center",
+            anchor="center",
+        )
+        hdr.pack(fill="x", pady=(6, 2))
+
+        lines = [
+            "• Changed UI theme to a darker theme",
+            "• Added a top toolbar for preset/save-path/game-folder actions",
+            "• Added small icons to the tab headers",
+            "• Mods tab for loading 3rd party mods",
+            "• Separated Main and XP section",
+            "• Jumping height added",
+            "• Movement speed up to 300%",
+        ]
+
+        color_map = {
+            1: ("blue", "#66aaff"),
+            3: ("pink", "#ff66cc"),
+
+        }
+
+        bullets = tk.Text(
+            main_wrapper,
+            height=len(lines),
+            wrap="none",
+            borderwidth=0,
+            highlightthickness=0,
+            padx=180,   # <-- justera: 120–260 beroende på fönsterbredd
+            pady=0,
+            font=("Arial", 10),
+            fg="#b8b8b8",
+            bg=main_wrapper.cget("bg"),
+        )
+        bullets.pack(fill="x", pady=(0, 8))
+        
+        smm_note = tk.Label(
+            main_wrapper,
+            text="Please run Super Mod Merger if you have installed 3rd party mods.",
+            font=("Arial", 10, "bold"),
+            fg="#ffd54a",  # mild gul
+            bg=main_wrapper.cget("bg"),
+            justify="center",
+        )
+        smm_note.pack(fill="x", pady=(0, 10))
+        
+        def _update_bullets_pad(_evt=None):
+            # ungefärlig “blockbredd” du vill ha
+            target_width = 300  # test
+            w = bullets.winfo_width()
+            if w <= 1:
+                return
+            pad = max(10, (w - target_width) // 2)
+            bullets.config(padx=pad)
+
+        bullets.bind("<Configure>", _update_bullets_pad)
+        _update_bullets_pad()
+
+        for _, (tag, col) in color_map.items():
+            bullets.tag_configure(tag, foreground=col)
+
+        for i, line in enumerate(lines):
+            start = bullets.index("end-1c")
+            bullets.insert("end", line + ("\n" if i < len(lines)-1 else ""))
+            end = bullets.index("end-1c")
+            if i in color_map:
+                tag, _ = color_map[i]
+                bullets.tag_add(tag, start, end)
+
+        bullets.config(state="disabled", cursor="arrow")
+
+
+        main_content_frame = tk.Frame(main_wrapper)
+        main_content_frame.pack(fill="x", pady=(0, 0))
+
+        return {
+            "main_content_frame": main_content_frame,
+            "xp_banner_frame": xp_banner_frame,
+        }
+
+
+    def build_xp_tab(parent, main_content_frame):
+        """XP tab: Choose mode, Open World/Legend sliders, advanced, reset XP."""
+        xp_wrapper = tk.Frame(parent)
+        xp_wrapper.pack(fill="both", expand=True)
+        choose_mode_frame = tk.Frame(xp_wrapper)
+        choose_mode_frame.pack(fill="x", pady=(0, 0))
+        xp_badge = tk.Frame(
+            choose_mode_frame,
+            highlightbackground="#8A8A8A",
+            highlightthickness=2,
+            bd=0,
+        )
+        xp_badge.pack(pady=(10, 10))
+        tk.Label(
+            xp_badge,
+            text="Choose XP Mode",
+            font=("Arial", 11, "bold"),
+            padx=13,
+            pady=8,
+        ).pack()
+        xp_card = tk.Frame(choose_mode_frame, highlightthickness=1, highlightbackground="#8A8A8A")
+        xp_card.pack(fill="x", padx=50)
+        radio_frame = tk.Frame(xp_card)
+        radio_frame.pack(pady=(2, 0))
+        rb_font = ("Arial", 11)
+        rb_ow = tk.Radiobutton(
+            radio_frame,
+            text="Open World XP (pre-NG+)",
+            variable=mode,
+            value="openworld",
+            font=rb_font,
+            pady=0,
+        )
+        rb_ow.pack(anchor="w")
+        rb_leg = tk.Radiobutton(
+            radio_frame,
+            text="Legend XP Bonus (NG+)",
+            variable=mode,
+            value="legend",
+            font=rb_font,
+            pady=2,
+        )
+        rb_leg.pack(anchor="w")
+        openworld_frame = tk.Frame(xp_card)
+        legend_frame = tk.Frame(xp_card)
+        ow_wrap = tk.Frame(openworld_frame)
+        ow_wrap.pack(anchor="center")
+        legend_scroll_outer, legend_scroll_inner = make_scrollable(legend_frame)
+        legend_scroll_outer.pack(fill="both", expand=True)
+        for w in legend_scroll_outer.winfo_children():
+            if isinstance(w, tk.Canvas):
+                w.configure(height=320)
+                break
+        tk.Label(
+            ow_wrap,
+            text="Open World XP Multiplier",
+            font=("Arial", 11, "bold"),
+        ).pack(anchor="center", pady=(0, 0))
+        row, scale, entry = ui_labeled_slider(
+            ow_wrap,
+            "",
+            openworld_var,
+            from_=1.0,
+            to=100.0,
+            hint="(1 = vanilla)",
+            font_title=("Arial", 11, "bold"),
+            resolution=1.0,
+        )
+        legend_easy_var.set(1.0)
+        legend_hard_var.set(1.05)
+        legend_nightmare_var.set(1.15)
+        def refresh_advanced():
+            pass  # no-op: advanced sliders are always visible now
+
+        TEXT = "#1A1A1A"
+        BG = "#D9C06A"
+        XP_SLIDER_LEN = 172  # short sliders so two columns fit and align side by side
+        XP_COL_PADX = 24     # even spacing between left and right section
+
+        two_col_wrap = tk.Frame(legend_scroll_inner)
+        two_col_wrap.pack(fill="x", pady=(8, 0))
+        two_col_inner = tk.Frame(two_col_wrap)
+        two_col_inner.pack(fill="x", expand=True)
+        two_col_inner.grid_columnconfigure(0, weight=1, minsize=320)
+        two_col_inner.grid_columnconfigure(1, weight=1, minsize=320)
+
+        # Left column: Legend XP Loss on Death + Legend XP Multipliers (Easy/Normal, Hard, Nightmare)
+        left_col = tk.Frame(two_col_inner)
+        left_col.grid(row=0, column=0, sticky="n", padx=(0, XP_COL_PADX // 2))
+        tk.Label(
+            left_col,
+            fg="#666666",
+            font=("Arial", 8),
+        ).pack(anchor="w")
+        # Left column 
+        ui_labeled_slider(
+            left_col,
+            "Legend XP Loss(%)",
+            ll_xp_loss_var,
+            from_=0,
+            to=500,
+            resolution=1.0,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+        legend_header = tk.Frame(
+            left_col, bg=BG, highlightbackground=COLOR_BORDER, highlightthickness=1
+        )
+        legend_header.pack(fill="x", pady=(0, 14))
+        ui_labeled_slider(
+            left_col,
+            "Easy / Normal XP",
+            legend_easy_var,
+            from_=1.0,
+            to=300.0,
+            resolution=0.01,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+        ui_labeled_slider(
+            left_col,
+            "Hard XP",
+            legend_hard_var,
+            from_=1.0,
+            to=300.0,
+            resolution=0.01,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+        ui_labeled_slider(
+            left_col,
+            "Nightmare XP",
+            legend_nightmare_var,
+            from_=1.0,
+            to=300.0,
+            resolution=0.01,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+
+        # Right column: Legend Penalty, NG+ Bonus, Coop Bonus, Quest Legend (always visible)
+        right_col = tk.Frame(two_col_inner)
+        right_col.grid(row=0, column=1, sticky="n", padx=(XP_COL_PADX // 2, 0))
+
+        _spacer_top = tk.Frame(right_col, height=20)
+        _spacer_top.pack(fill="x")
+        _spacer_top.pack_propagate(False)
+
+        ui_labeled_slider(
+            right_col,
+            "Legend Penalty *",
+            legend_penalty_var,
+            from_=0.0,
+            to=5.0,
+            resolution=0.05,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+
+        
+        _spacer_between = tk.Frame(right_col, height=16)
+        _spacer_between.pack(fill="x")
+        _spacer_between.pack_propagate(False)
+
+        ui_labeled_slider(
+            right_col,
+            "NG+ Bonus *",
+            ngplus_var,
+            from_=0.0,
+            to=5.0,
+            resolution=0.05,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+
+        ui_labeled_slider(
+            right_col,
+            "Coop Bonus *",
+            coop_var,
+            from_=0.0,
+            to=5.0,
+            resolution=0.05,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+
+        ui_labeled_slider(
+            right_col,
+            "Quest Legend *",
+            quest_lp_var,
+            from_=1.0,
+            to=10.0,
+            resolution=0.05,
+            tight=True,
+            slider_length=XP_SLIDER_LEN,
+        )
+
+
+        ttk.Separator(legend_scroll_inner, orient="horizontal").pack(fill="x", pady=(8, 8))
+
+        btn_reset_xp = tk.Button(xp_card, text="Reset XP to defaults")
+        btn_reset_xp.pack(pady=(10, 14))
+        return {
+            "openworld_frame": openworld_frame,
+            "legend_frame": legend_frame,
+            "rb_ow": rb_ow,
+            "rb_leg": rb_leg,
+            "btn_reset_xp": btn_reset_xp,
+            "xp_badge": xp_badge,
+            "refresh_advanced": refresh_advanced,
+        }
+
+    main_ui = build_main_tab(main_tab)
+    xp_ui = build_xp_tab(xp_tab, main_ui["main_content_frame"])
+
+    openworld_frame = xp_ui["openworld_frame"]
+    legend_frame = xp_ui["legend_frame"]
+    rb_ow = xp_ui["rb_ow"]
+    rb_leg = xp_ui["rb_leg"]
+    btn_reset_xp = xp_ui["btn_reset_xp"]
+    refresh_advanced = xp_ui["refresh_advanced"]
 
     # =========================
     # Flashlight tab content
@@ -4043,25 +5331,21 @@ def build_ui():
     fl_outer.pack(fill="both", expand=True)
     tk.Label(fl_wrap, text="Flashlight", font=("Arial", 12, "bold")).pack(pady=10)
 
-    fl_card = tk.Frame(fl_wrap, highlightthickness=1, highlightbackground="#CFCFCF")
+    fl_card = tk.Frame(fl_wrap, highlightthickness=1, highlightbackground="#8A8A8A")
     fl_card.pack(padx=60, pady=12, fill="x")
 
     # --- Flashlight Colors (postprocess) ---
-    colors_box = tk.LabelFrame(fl_card, text="Flashlight Colors (postprocess)")
-    colors_box.pack(fill="x", padx=5, pady=(4, 5))
+    colors_box = tk.Frame(fl_card)  # ingen LabelFrame-ram
+    colors_box.pack(fill="x", padx=10, pady=(8, 6))
+
+    tk.Label(colors_box, text="Flashlight Colors (postprocess)", font=("Arial", 10, "bold")).pack(anchor="w")
 
     tk.Label(
         colors_box,
         text="Defaults: Normal = [1.0, 0.95, 0.87]   UV = [0.15, 0.5, 1.0]",
         fg="#666666",
     ).pack(anchor="w", pady=(4, 0))
-
-    fl_reset_row = tk.Frame(fl_card)
-    fl_reset_row.pack(fill="x", padx=10, pady=(6, 0))
-
-    btn_reset_fl = tk.Button(fl_reset_row, text="Reset everything to defaults")
-    btn_reset_fl.pack()
-
+    
     fl_colors_btn_row = tk.Frame(colors_box)
     fl_colors_btn_row.pack(fill="x", pady=(4, 6))
 
@@ -4078,10 +5362,13 @@ def build_ui():
 
     uv_swatch = ui_color_swatch(fl_colors_btn_row, uv_r, uv_g, uv_b)
     uv_swatch.pack(side="left")
-
+    
     ui_color_line(colors_box, "Normal:", pp_r, pp_g, pp_b)
-    ui_color_line(colors_box, "UV:", uv_r, uv_g, uv_b)
+    ui_color_line(colors_box, "UV:", uv_r, uv_g, uv_b)  
 
+    btn_reset_fl = tk.Button(fl_colors_btn_row, text="Reset everything to defaults")
+    btn_reset_fl.pack(side="left", padx=(40, 0))  
+    
     tk.Checkbutton(
         fl_card,
         text="Unlimited battery on Nightmare (BatteryPoweredFlashlightItemName -> Player_Flashlight)",
@@ -4093,8 +5380,11 @@ def build_ui():
     flashlight_controls.pack(fill="x")
 
     # LVL 1 & 2 shared
-    lf12 = tk.LabelFrame(flashlight_controls, text="UV LVL 1 & 2 (shared)")
+    lf12 = tk.Frame(flashlight_controls)
     lf12.pack(fill="x", pady=(0, 10))
+
+    tk.Label(lf12, text="UV LVL 1 & 2 (shared)", font=("Arial", 10, "bold")).pack(anchor="w", pady=(0,4))
+
 
     ui_labeled_slider(
         lf12, "EnergyDrainPerSecond", uv12_drain_var, from_=0.0, to=5.0, resolution=0.05
@@ -4120,22 +5410,19 @@ def build_ui():
     )
 
     def add_lvl(parent, title, drain_var, energy_var, regen_var):
-        lf = tk.LabelFrame(parent, text=title)
+        lf = tk.Frame(parent)
         lf.pack(fill="x", pady=(0, 10))
-        ui_labeled_slider(
-            lf, "EnergyDrainPerSecond", drain_var, from_=0.0, to=5.0, resolution=0.05
-        )
-        ui_labeled_slider(
-            lf, "MaxEnergy", energy_var, from_=0.0, to=50.0, resolution=0.5
-        )
-        ui_labeled_slider(
-            lf, "RegenerationDelay", regen_var, from_=0.0, to=10.0, resolution=0.05
-        )
+
+        tk.Label(lf, text=title, font=("Arial", 10, "bold")).pack(anchor="w", pady=(0,4))
+
+        ui_labeled_slider(lf, "EnergyDrainPerSecond", drain_var, from_=0.0, to=5.0, resolution=0.05)
+        ui_labeled_slider(lf, "MaxEnergy", energy_var, from_=0.0, to=50.0, resolution=0.5)
+        ui_labeled_slider(lf, "RegenerationDelay", regen_var, from_=0.0, to=10.0, resolution=0.05)
 
     add_lvl(
-        flashlight_controls, "UV LVL 3", uv3_drain_var, uv3_energy_var, uv3_regen_var
+         flashlight_controls, "UV LVL 3", uv3_drain_var, uv3_energy_var, uv3_regen_var
     )
-
+    
     # --- Advanced toggle (LVL 4-5) ---
     adv_row = tk.Frame(flashlight_controls)
     adv_row.pack(fill="x", pady=(4, 8))
@@ -4235,7 +5522,7 @@ def build_ui():
     tk.Frame(hu_wrapper).grid(row=2, column=0, sticky="nsew")
 
     # --- Card (centered) ---
-    hu_card = tk.Frame(hu_wrapper, highlightthickness=1, highlightbackground="#CFCFCF")
+    hu_card = tk.Frame(hu_wrapper, highlightthickness=1, highlightbackground="#8A8A8A")
     hu_card.grid(row=3, column=0, padx=60, sticky="ew")
 
     # --- Info button (opens popup) ---
@@ -4374,178 +5661,137 @@ def build_ui():
 ).grid(row=1, column=2, padx=6, pady=(2, 0), sticky="ew")
 
     # =========================
-    # Nightspawns tab content (centered)
-    # =========================
-    ni_wrapper = tk.Frame(night_tab)
-    ni_wrapper.pack(fill="both", expand=True)
-
-    # top spacer
-    ni_top_spacer = tk.Frame(ni_wrapper)
-    ni_top_spacer.pack(fill="both", expand=True)
-
-    # --- Header OUTSIDE the card ---
-    ni_badge = tk.Frame(
-        ni_wrapper,
-        highlightbackground="#8A8A8A",
-        highlightthickness=2,
-        bd=0,
-    )
-    ni_badge.pack(pady=(30, 20))
-
-    tk.Label(
-        ni_badge,
-        text="Night pursuit",
-        font=("Arial", 15, "bold"),
-        padx=14,
-        pady=6,
-    ).pack()
-
-    # --- Info card under header ---
-    ni_info = tk.Frame(ni_wrapper, highlightthickness=1, highlightbackground="#CFCFCF")
-    ni_info.pack(padx=60, pady=(0, 12), fill="x")
-
-    info_text = (
-        "Max zombies that can actively chase you during a night pursuit.\n"
-        "Usually Volatiles, but may include other infected depending on the situation.\n"
-        "Chase limit is for both day and night."
-    )
-
-    lbl = tk.Label(
-        ni_info,
-        text=info_text,
-        font=("Arial", 9),
-        justify="center",
-        anchor="center",
-        wraplength=600,
-        padx=10,
-        pady=10,
-    )
-    lbl.pack(fill="x")
-
-    def _wrap(_evt=None):
-        w = ni_info.winfo_width()
-        if w > 50:
-            lbl.config(wraplength=w - 40)
-
-    ni_info.bind("<Configure>", _wrap)
-
-    # --- Card (centered) ---
-    ni_card = tk.Frame(ni_wrapper, highlightthickness=1, highlightbackground="#CFCFCF")
-    ni_card.pack(padx=60, pady=0, fill="x")
-
-    # bottom spacer
-    ni_bottom_spacer = tk.Frame(ni_wrapper)
-    ni_bottom_spacer.pack(fill="both", expand=True)
-
-    ui_labeled_slider(
-        ni_card,
-        "Easy_Level1",
-        ni_begin_l1,
-        from_=0,
-        to=20,
-        resolution=1,
-    )
-    ui_labeled_slider(
-        ni_card,
-        "Slums_Level2",
-        ni_begin_l2_slums_l1,
-        from_=0,
-        to=20,
-        resolution=1,
-    )
-    ui_labeled_slider(ni_card, "Easy_Level3", ni_begin_l3, from_=0, to=25, resolution=1)
-    ui_labeled_slider(
-        ni_card,
-        "Easy_Slums_Lvl4",
-        ni_begin_l4_slums_l3,
-        from_=0,
-        to=30,
-        resolution=1,
-    )
-
-    ui_labeled_slider(ni_card, "Slums_Level2", ni_slums_l2, from_=0, to=30, resolution=1)
-    ui_labeled_slider(ni_card, "Slums_Level4", ni_slums_l4, from_=0, to=40, resolution=1)
-
-    ui_labeled_slider(ni_card, "OLDTOWN_Lvl1", ni_ot_l1, from_=0, to=30, resolution=1)
-    ui_labeled_slider(ni_card, "OLDTOWN_Lvl2", ni_ot_l2, from_=0, to=30, resolution=1)
-    ui_labeled_slider(ni_card, "OLDTOWN_Lvl3", ni_ot_l3, from_=0, to=40, resolution=1)
-    ui_labeled_slider(ni_card, "OLDTOWN_Lvl4", ni_ot_l4, from_=0, to=50, resolution=1)
-
-    ui_labeled_slider(
-        ni_card,
-        "Chase limit",
-        sp_chase_limit,
-        from_=0,
-        to=100,
-        resolution=5,
-    )
-    tk.Label(ni_card, text="Hard cap 100. Vanilla 15.", fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 2))
-
-    btn_reset_ni = tk.Button(ni_card, text="Reset Chase limit tab to defaults")
-    btn_reset_ni.pack(pady=(10, 14))
-    
-
-    # =========================
     #   Player tab Content
     # =========================
     pl_wrapper = tk.Frame(player_tab)
     pl_wrapper.pack(fill="both", expand=True)
 
     pl_card = tk.Frame(
-        pl_wrapper, highlightthickness=1, highlightbackground="#CFCFCF"
+        pl_wrapper, highlightthickness=1, highlightbackground="#8A8A8A"
     )
     pl_card.pack(padx=60, pady=12, fill="x")
 
-    # --- Climb options (player_variables.scr) - at top ---
-    pl_climb_frame = tk.Frame(pl_card)
-    pl_climb_frame.pack(fill="x", pady=(6, 4))
+    # --- Climb options (player_variables.scr) - 2x2 grid, top center ---
+    pl_climb_wrapper = tk.Frame(pl_card)
+    pl_climb_wrapper.pack(fill="x", pady=(6, 4))
+    climb_grid = tk.Frame(pl_climb_wrapper)
+    climb_grid.pack(anchor="center")
+    climb_grid.grid_columnconfigure(0, weight=1)
+    climb_grid.grid_columnconfigure(1, weight=1)
+    # row 0 col 0, row 1 col 0 = left column (west)
     tk.Checkbutton(
-        pl_climb_frame,
+        climb_grid,
         text="LadderClimbSlow = false",
         variable=pl_ladder_climb_slow_var,
         font=("Arial", 9),
-    ).pack(anchor="w")
+    ).grid(row=0, column=0, sticky="w", padx=(0, 24), pady=0)
     tk.Checkbutton(
-        pl_climb_frame,
+        climb_grid,
         text="FastClimbEnabled = true",
         variable=pl_fast_climb_enabled_var,
         font=("Arial", 9),
-    ).pack(anchor="w")
+    ).grid(row=1, column=0, sticky="w", padx=(0, 24), pady=0)
+    # row 0 col 1, row 1 col 1 = right column checkbuttons + warn labels added later
 
     tk.Label(
         pl_card,
         text="Movement speed (safe sliders)",
         font=("Arial", 12, "bold"),
     ).pack(pady=(10, 4))
+    
+    pl_hint = "Bonus on top of vanilla. Multiplier = 1.0 + (bonus/100). Ex: 100% = 2.0x, 300% = 4.0x"
+    
+    tk.Label(pl_card, text=pl_hint, fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 4)
+    )
 
-    pl_hint = "0% = vanilla, 50% = 1.5x, 100% = 2.0x"
-    ui_labeled_slider(
-        pl_card,
-        "Water speed (%)",
-        pl_water_speed_pct,
+    SAFE_MAX = 100
+    OVERRIDE_MAX = 300
+    override_var = tk.BooleanVar(value=False)
+
+    pl_speed_grid = make_two_column_grid(pl_card)
+    pl_speed_grid.pack(fill="x", pady=(0, 4))
+    pl_speed_specs = [
+        ("Water speed bonus (%)", pl_water_speed_pct),
+        ("Land speed bonus (%)", pl_land_speed_pct),
+        ("Boost speed bonus (%)", pl_boost_speed_pct),
+    ]
+    water_ret = land_ret = boost_ret = None
+    for idx, (title, var) in enumerate(pl_speed_specs):
+        cell = tk.Frame(pl_speed_grid)
+        cell.grid(row=idx // 2, column=idx % 2, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+        ret = ui_labeled_slider(cell, title, var, from_=0, to=SAFE_MAX, resolution=5, slider_length=220)
+        if idx == 0:
+            water_ret = ret
+        elif idx == 1:
+            land_ret = ret
+        else:
+            boost_ret = ret
+
+    water_scale = find_scale(water_ret)
+    land_scale  = find_scale(land_ret)
+    boost_scale = find_scale(boost_ret)
+
+    if not all([water_scale, land_scale, boost_scale]):
+        raise RuntimeError("Could not find ttk.Scale returned/created by ui_labeled_slider()")
+
+    cb_override_speed = tk.Checkbutton(
+        climb_grid,
+        text=f"Override max speed {OVERRIDE_MAX}%",
+        variable=override_var,
+        font=("Arial", 9),
+    )
+    cb_override_speed.grid(row=0, column=1, sticky="w", padx=(0, 0), pady=0)
+
+    def apply_override():
+        new_max = OVERRIDE_MAX if override_var.get() else SAFE_MAX
+
+        for sc in (water_scale, land_scale, boost_scale):
+            sc.config(to=new_max)
+
+        if not override_var.get():
+            for var in (pl_water_speed_pct, pl_land_speed_pct, pl_boost_speed_pct):
+                if var.get() > SAFE_MAX:
+                    var.set(SAFE_MAX)
+
+    cb_override_speed.config(command=apply_override)
+    apply_override()
+
+    # Jump
+    jump_cell = tk.Frame(pl_speed_grid)
+    jump_cell.grid(row=1, column=1, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+
+    jump_ret = ui_labeled_slider(
+        jump_cell,  # eller pl_card / jump_cell i grid
+        "Jump height boost",
+        jump_boost_var,
         from_=0,
-        to=100,
-        resolution=5,
+        to=JUMP_SAFE_MAX,          # börjar safe
+        resolution=1,
+        tight=True,
+        slider_length=220,
     )
-    ui_labeled_slider(
-        pl_card,
-        "Land speed (%)",
-        pl_land_speed_pct,
-        from_=0,
-        to=100,
-        resolution=5,
+    jump_scale = jump_ret[1]
+    jump_entry = jump_ret[2]
+    jump_entry.config(width=3)
+
+    cb_override_jump = tk.Checkbutton(
+        climb_grid,
+        text=f"Override jump max {JUMP_OVERRIDE_MAX:g}",
+        variable=jump_override_var,
+        font=("Arial", 9),
     )
-    ui_labeled_slider(
-        pl_card,
-        "Boost speed (%)",
-        pl_boost_speed_pct,
-        from_=0,
-        to=100,
-        resolution=5,
-    )
-    tk.Label(pl_card, text=pl_hint, fg="#666666", font=("Arial", 8)).pack(
-        fill="x", pady=(0, 4)
-    )
+    cb_override_jump.grid(row=1, column=1, sticky="w", padx=(0, 0), pady=0)
+
+    def apply_jump_override():
+        new_max = JUMP_OVERRIDE_MAX if jump_override_var.get() else JUMP_SAFE_MAX
+        jump_scale.config(to=new_max)
+
+        if not jump_override_var.get() and jump_boost_var.get() > JUMP_SAFE_MAX:
+            jump_boost_var.set(JUMP_SAFE_MAX)
+
+    cb_override_jump.config(command=apply_jump_override)
+    apply_jump_override()
+
     btn_reset_pl = tk.Button(pl_card, text="Reset Player tab to defaults")
     btn_reset_pl.pack(pady=(10, 14))
 
@@ -4558,18 +5804,18 @@ def build_ui():
 
     pad_vh, pady_vh = 36, 8
     vh_card = tk.Frame(
-        vh_wrapper, highlightthickness=1, highlightbackground="#CFCFCF"
+        vh_wrapper, highlightthickness=1, highlightbackground="#8A8A8A"
     )
     vh_card.pack(padx=pad_vh, pady=pady_vh, fill="x")
 
-    controls_card = tk.Frame(vh_wrapper, highlightthickness=1, highlightbackground="#CFCFCF")
+    controls_card = tk.Frame(vh_wrapper, highlightthickness=1, highlightbackground="#8A8A8A")
     controls_card.pack(padx=pad_vh, pady=(0, pady_vh), fill="x")
 
     # -------------------------
-    # Fuel section (always visible)
+    # Fuel section (always visible) — 2 columns
     # -------------------------
     fuel_frame = tk.Frame(controls_card, highlightthickness=1, highlightbackground="#DDD")
-    fuel_frame.pack(fill="x", padx=0, pady=(3, 5))  # <-- VIKTIGT: packa den!
+    fuel_frame.pack(fill="x", padx=0, pady=(3, 5))
 
     tk.Label(
         fuel_frame,
@@ -4578,11 +5824,19 @@ def build_ui():
     ).pack(fill="x", anchor="center", padx=4, pady=(2, 2))
 
     def fuel_usage_color(val):
-        t = val / 100.0
-        r = int(255 * (1 - t))
-        g = int(255 * t)
-        b = 0
-        return (min(255, r), min(255, g), min(255, b))
+        # clamp 0..100
+        v = max(0.0, min(100.0, float(val)))
+        t = v / 100.0  # 0..1
+
+        # 0%  -> nästan grå men lite röd tint (svagast möjligt utan att bli osynlig)
+        r0, g0, b0 = 135, 125, 125
+        # 100% -> neutral grå (vanilla)
+        r1, g1, b1 = 145, 145, 145
+
+        r = int(r0 + (r1 - r0) * t)
+        g = int(g0 + (g1 - g0) * t)
+        b = int(b0 + (b1 - b0) * t)
+        return (r, g, b)
 
     def fuel_max_color(val):
         t = (val - 100) / 900.0 if val > 100 else 0.0
@@ -4599,11 +5853,17 @@ def build_ui():
             b = 255
         return (min(255, max(0, r)), min(255, max(0, g)), min(255, max(0, b)))
 
+    fuel_grid = make_two_column_grid(fuel_frame)
+    fuel_grid.pack(fill="x", padx=4, pady=(0, 2))
+    fuel_left = tk.Frame(fuel_grid)
+    fuel_left.grid(row=0, column=0, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+    fuel_right = tk.Frame(fuel_grid)
+    fuel_right.grid(row=0, column=1, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
     _fuel_color_bar_row(
-        fuel_frame, "Fuel usage (%)", fuel_usage_pct, 0, 100, 1, fuel_usage_color
+        fuel_left, "Fuel usage (%)", fuel_usage_pct, 0, 100, 1, fuel_usage_color
     )
     _fuel_color_bar_row(
-        fuel_frame, "Fuel max (%)", fuel_max_pct, 100, 1000, 10, fuel_max_color
+        fuel_right, "Fuel max (%)", fuel_max_pct, 100, 1000, 10, fuel_max_color
     )
 
     tk.Label(
@@ -4670,11 +5930,22 @@ def build_ui():
     def _centered_slider(parent, title, var, from_, to, resolution=1):
         outer = tk.Frame(parent)
         outer.pack(fill="x", pady=(0, 4))
+
         tk.Label(
-            outer, text=title, font=("Arial", 9, "bold"), anchor="center"
+            outer,
+            text=title,
+            font=("Arial", 9, "bold"),
+            anchor="center",
+            justify="center",
         ).pack(fill="x")
-        row = tk.Frame(outer)
-        row.pack(fill="x", pady=1)
+
+        # wrapper som centrerar hela slider+entry-blocket
+        row_wrap = tk.Frame(outer)
+        row_wrap.pack(fill="x", pady=1)
+
+        row = tk.Frame(row_wrap)
+        row.pack(anchor="center")   # <-- detta är nyckeln
+
         scale = tk.Scale(
             row,
             from_=from_,
@@ -4683,17 +5954,26 @@ def build_ui():
             variable=var,
             showvalue=0,
             resolution=resolution,
+            length=280,
         )
-        scale.pack(side="left", fill="x", expand=True, padx=(0, 2))
-        tk.Entry(row, width=5, textvariable=var).pack(side="left")
+        scale.pack(side="left", padx=(0, 6))
+        tk.Entry(row, width=5, textvariable=var, justify="right").pack(side="left")
+
         return outer
 
+
+    vh_slider_grid = make_two_column_grid(vh_card)
+    vh_slider_grid.pack(fill="x", pady=(0, 4))
+    vh_cell0 = tk.Frame(vh_slider_grid)
+    vh_cell0.grid(row=0, column=0, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+    vh_cell1 = tk.Frame(vh_slider_grid)
+    vh_cell1.grid(row=0, column=1, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
     _centered_slider(
-        vh_card, "Vehicle_Pickup (%) — default 1150 HP",
+        vh_cell0, "Vehicle_Pickup (%) — default 1150 HP",
         veh_pickup_pct, 100, 1000, 10
     )
     _centered_slider(
-        vh_card, "Vehicle_Pickup_CTB (%) — default 2000 HP",
+        vh_cell1, "Vehicle_Pickup_CTB (%) — default 2000 HP",
         veh_pickup_ctb_pct, 100, 1000, 10
     )
     btn_reset_vh = tk.Button(vh_card, text="Reset Vehicles tab to defaults")
@@ -4706,7 +5986,7 @@ def build_ui():
     vo_outer.pack(fill="both", expand=True)
 
     vo_card = tk.Frame(
-        vo_wrap, highlightthickness=1, highlightbackground="#CFCFCF"
+        vo_wrap, highlightthickness=1, highlightbackground=CARD_HIGHLIGHT, highlightcolor=CARD_HIGHLIGHT
     )
     vo_card.pack(padx=60, pady=12, fill="x")
 
@@ -4764,19 +6044,19 @@ def build_ui():
 
     # --- Alpha card section (Nightmare only) ---
     alpha_card = tk.Frame(
-        vo_wrap, highlightthickness=1, highlightbackground="#CFCFCF"
+        vo_wrap, highlightthickness=1, highlightbackground=CARD_HIGHLIGHT, highlightcolor=CARD_HIGHLIGHT
     )
-    alpha_card.pack(padx=30, pady=(0, 12), fill="x")
+    alpha_card.pack(padx=60, pady=(0, 12), fill="x")
 
     # “badge” / Nightmare-only
     alpha_badge = tk.Frame(
-        alpha_card, highlightbackground="#8A8A8A", highlightthickness=2, bd=0
+        alpha_card, highlightbackground="#8A8A8A", highlightthickness=1, bd=0
     )
     alpha_badge.pack(pady=(10, 6))
     tk.Label(
         alpha_badge,
         text="Nightmare only — Alpha volatile",
-        font=("Arial", 11, "bold"),
+        font=("Arial", 9),
         padx=12,
         pady=4,
     ).pack()
@@ -4812,7 +6092,7 @@ def build_ui():
 
     # --- Spawn scaling section (AIPresetPool) ---
     spawn_card = tk.Frame(
-        vo_wrap, highlightthickness=1, highlightbackground="#CFCFCF"
+        vo_wrap, highlightthickness=1, highlightbackground=CARD_HIGHLIGHT, highlightcolor=CARD_HIGHLIGHT
     )
     spawn_card.pack(padx=60, pady=(0, 12), fill="x")
 
@@ -4823,7 +6103,7 @@ def build_ui():
         vo_weights_cb_frame,
         text="Volatile Weights",
         variable=vo_weights_visible_var,
-        font=("Arial", 10, "bold"),
+        font=("Arial", 9),
     )
     vo_weights_cb.pack(anchor="center")
 
@@ -4923,7 +6203,7 @@ def build_ui():
     )
     ui_labeled_slider(
         spawn_card,
-        "Apex/Alpha & Tyrant Volatiles HP %",
+        "Alpha & Tyrant HP %",
         vo_hp_apex_pct,
         from_=20,
         to=300,
@@ -4966,7 +6246,7 @@ def build_ui():
     en_outer.pack(fill="both", expand=True)
     
     en_card = tk.Frame(
-        en_wrap, highlightthickness=1, highlightbackground="#CFCFCF"
+        en_wrap, highlightthickness=1, highlightbackground="#8A8A8A"
     )
     en_card.pack(padx=40, pady=8, fill="x")
     
@@ -4998,38 +6278,24 @@ def build_ui():
     btn_reset_en.pack(anchor="center")
 
     en_hp_hint = "100% = vanilla. 10% = 0.1× health, 500% = 5× health."
-    ui_labeled_slider(
-        en_card,
-        "Easy",
-        en_human_hp_bonus_easy_pct,
-        from_=10,
-        to=500,
-        resolution=10,
-    )
-    ui_labeled_slider(
-        en_card,
-        "Normal",
-        en_human_hp_bonus_normal_pct,
-        from_=10,
-        to=500,
-        resolution=10,
-    )
-    ui_labeled_slider(
-        en_card,
-        "Hard",
-        en_human_hp_bonus_hard_pct,
-        from_=10,
-        to=500,
-        resolution=10,
-    )
-    ui_labeled_slider(
-        en_card,
-        "Nightmare",
-        en_human_hp_bonus_nightmare_pct,
-        from_=10,
-        to=500,
-        resolution=10,
-    )
+    en_hp_grid = make_two_column_grid(en_card)
+    en_hp_grid.pack(fill="x", pady=(0, 4))
+    for i, (label, var) in enumerate([
+        ("Easy", en_human_hp_bonus_easy_pct),
+        ("Normal", en_human_hp_bonus_normal_pct),
+        ("Hard", en_human_hp_bonus_hard_pct),
+        ("Nightmare", en_human_hp_bonus_nightmare_pct),
+    ]):
+        cell = tk.Frame(en_hp_grid)
+        cell.grid(row=i // 2, column=i % 2, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+        ui_labeled_slider(
+            cell, label, var,
+            from_=10, to=500, resolution=10,
+            slider_length=220,
+            label_width=9,      # <-- gör labeln smalare
+            entry_width=5,      # valfritt
+        )
+
     tk.Label(en_card, text=en_hp_hint, fg="#666666", font=("Arial", 8)).pack(
         fill="x", pady=(0, 6)
     )
@@ -5053,35 +6319,26 @@ def build_ui():
         block = tk.Frame(en_adv_scroll_inner, highlightthickness=1, highlightbackground="#ddd")
         block.pack(fill="x", pady=(0, 6))
         tk.Label(block, text=tag, font=("Arial", 10, "bold"), anchor="center").pack(fill="x", padx=6, pady=(4, 2))
-        ui_labeled_slider(block, "Easy %", easy_var, from_=10, to=500, resolution=5, label_width=10, font_title=("Arial", 9))
-        ui_labeled_slider(block, "Normal %", normal_var, from_=10, to=500, resolution=5, label_width=10, font_title=("Arial", 9))
-        ui_labeled_slider(block, "Hard %", hard_var, from_=10, to=500, resolution=5, label_width=10, font_title=("Arial", 9))
-        ui_labeled_slider(block, "Nightmare %", nm_var, from_=10, to=500, resolution=5, label_width=10, font_title=("Arial", 9))
+        tag_grid = make_two_column_grid(block)
+        tag_grid.pack(fill="x", padx=4, pady=(0, 4))
+        for j, (lbl, var) in enumerate([
+            ("Easy %", easy_var), ("Normal %", normal_var), ("Hard %", hard_var), ("Nightmare %", nm_var),
+        ]):
+            cell = tk.Frame(tag_grid)
+            cell.grid(row=j // 2, column=j % 2, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+            ui_labeled_slider(cell, lbl, var, from_=10, to=500, resolution=5, label_width=10, font_title=("Arial", 9), slider_length=200)
         
     en_advanced_visible = [False]
 
     adv_wrap = tk.Frame(en_card)
     adv_wrap.pack(fill="x", pady=(4, 6))
 
-    def toggle_en_advanced():
-        if en_advanced_visible[0]:
-            en_advanced_frame.pack_forget()
-            btn_en_advanced.config(text="Show all sliders for enemies and bosses")
-            en_advanced_visible[0] = False
-        else:
-            
-            en_advanced_frame.pack(fill="x", pady=(6, 8), after=adv_wrap)
-            btn_en_advanced.config(text="Hide advanced enemy sliders")
-            en_advanced_visible[0] = True
-
     btn_en_advanced = tk.Button(
         adv_wrap,
         text="Show all sliders for enemies and bosses",
-        command=toggle_en_advanced,          # ingen lambda behövs
-        font=("Arial", 10),
+        font=("Arial", 10, "bold"),
     )
     btn_en_advanced.pack()  # centrerad i wrappern
-
 
     def toggle_en_advanced():
         if en_advanced_visible[0]:
@@ -5089,9 +6346,72 @@ def build_ui():
             btn_en_advanced.config(text="Show all sliders for enemies and bosses")
             en_advanced_visible[0] = False
         else:
-            en_advanced_frame.pack(fill="both", expand=False, pady=(6, 8), after=btn_en_advanced)
+            # visa advanced direkt under knappen (wrappern), snyggt & stabilt
+            en_advanced_frame.pack(fill="both", expand=False, pady=(6, 8), after=adv_wrap)
             btn_en_advanced.config(text="Hide advanced enemy sliders")
             en_advanced_visible[0] = True
+
+    btn_en_advanced.config(command=toggle_en_advanced)
+
+    # --- Chase limit (moved from former Chase limit tab) ---
+    chase_limit_visible = [False]
+    chase_limit_btn_row = tk.Frame(en_card)
+    chase_limit_btn_row.pack(fill="x", pady=(8, 4), after=adv_wrap)
+
+    btn_chase_limit = tk.Button(
+        chase_limit_btn_row,
+        text="Show chase limit sliders",
+        font=("Arial", 10, "bold"),
+    )
+    btn_chase_limit.pack()
+
+    chase_limit_frame = tk.Frame(en_card, highlightthickness=1, highlightbackground="#8A8A8A")
+    # chase_limit_frame not packed initially (hidden)
+
+    tk.Label(
+        chase_limit_frame,
+        text="Chase limit — max zombies that can actively chase you (day and night).",
+        font=("Arial", 9),
+        fg="#666666",
+        wraplength=500,
+    ).pack(fill="x", padx=8, pady=(8, 4))
+
+    ni_slider_specs = [
+        ("Easy_Level1", ni_begin_l1, 0, 20),
+        ("Slums_Level2", ni_begin_l2_slums_l1, 0, 20),
+        ("Easy_Level3", ni_begin_l3, 0, 25),
+        ("Easy_Slums_Lvl4", ni_begin_l4_slums_l3, 0, 30),
+        ("Slums_Level2", ni_slums_l2, 0, 30),
+        ("Slums_Level4", ni_slums_l4, 0, 40),
+        ("OLDTOWN_Lvl1", ni_ot_l1, 0, 30),
+        ("OLDTOWN_Lvl2", ni_ot_l2, 0, 30),
+        ("OLDTOWN_Lvl3", ni_ot_l3, 0, 40),
+        ("OLDTOWN_Lvl4", ni_ot_l4, 0, 50),
+        ("Chase limit", sp_chase_limit, 0, 100),
+    ]
+    chase_grid = make_two_column_grid(chase_limit_frame)
+    chase_grid.pack(fill="x", padx=8, pady=(0, 4))
+    for i, (title, var, from_, to) in enumerate(ni_slider_specs):
+        cell = tk.Frame(chase_grid)
+        cell.grid(row=i // 2, column=i % 2, sticky="ew", padx=GRID_COL_PADX, pady=GRID_ROW_PADY)
+        res = 5 if "Chase limit" in title else 1
+        ui_labeled_slider(cell, title, var, from_=from_, to=to, resolution=res, slider_length=220)
+    tk.Label(chase_limit_frame, text="Hard cap 100. Vanilla 15.", fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 2), padx=8)
+
+    btn_reset_ni = tk.Button(chase_limit_frame, text="Reset Chase limit to defaults")
+    btn_reset_ni.pack(pady=(10, 14))
+
+    def toggle_chase_limit():
+        if chase_limit_visible[0]:
+            chase_limit_frame.pack_forget()
+            btn_chase_limit.config(text="Show chase limit sliders")
+            chase_limit_visible[0] = False
+        else:
+            chase_limit_frame.pack(fill="x", pady=(6, 8), after=chase_limit_btn_row)
+            btn_chase_limit.config(text="Hide chase limit sliders")
+            chase_limit_visible[0] = True
+
+    btn_chase_limit.config(command=toggle_chase_limit)
 
     # --- Spawns section (DISABLED - no effect in game v1.5+) ---
     spawn_banner_frame = tk.Frame(
@@ -5100,7 +6420,7 @@ def build_ui():
         highlightthickness=1,
         highlightbackground="#f2b8b8",
     )
-    spawn_banner_frame.pack(fill="x", pady=(12, 6), padx=0)
+    spawn_banner_frame.pack(fill="x", pady=(12, 6))
 
     # vänster accent-linje
     tk.Frame(spawn_banner_frame, bg="#d00000", width=6).pack(side="left", fill="y")
@@ -5110,7 +6430,7 @@ def build_ui():
 
     tk.Label(
         spawn_banner_body,
-        text="Spawn sliders disabled",
+        text="Spawns disabled (game v1.5+)",
         font=("Arial", 12, "bold"),
         fg="#2b2b2b",
         bg="#fff1f1",
@@ -5119,7 +6439,8 @@ def build_ui():
 
     tk.Label(
         spawn_banner_body,
-        text="Spawn changes currently have no effect in game version v1.5+.",
+        text="Spawn-related tweaks currently have no effect due to game changes in v1.5+.\n"
+             "I’ll re-enable this section if/when a reliable method becomes available.",
         font=("Arial", 9),
         fg="#444444",
         bg="#fff1f1",
@@ -5128,236 +6449,6 @@ def build_ui():
         anchor="w",
     ).pack(fill="x", pady=(3, 0))
 
-    spawn_controls_frame = tk.Frame(en_card)
-    spawn_controls_frame.pack(fill="x", pady=(0, 4))
-
-
-    sp_advanced_tuning_frame = tk.Frame(spawn_controls_frame)
-    sp_advanced_tuning_frame.pack(fill="x", pady=(4, 2))
-    tk.Checkbutton(
-        sp_advanced_tuning_frame,
-        text="Advanced Spawning",
-        variable=sp_advanced_tuning_var,
-        font=("Arial", 9),
-    ).pack(anchor="w")
-
-    en_spawn_frame = tk.Frame(spawn_controls_frame)
-    tk.Checkbutton(
-        en_spawn_frame,
-        text="EnablePrioritizationOfSpawners",
-        variable=en_spawn_priority_var,
-        font=("Arial", 9),
-    ).pack(anchor="w")
-
-    # --- Zombie Spawn / Hordes ---
-    sp_zombie_header = tk.Label(
-        spawn_controls_frame,
-        text="Zombie Spawn / Hordes",
-        font=("Arial", 12, "bold"),
-    )
-    sp_zombie_header.pack(pady=(10, 2))
-
-    # MaxSpawnedAI + warning: always visible, fixed position (never pack_forget)
-    sp_max_section = tk.Frame(spawn_controls_frame)
-    sp_max_section.pack(fill="x", pady=(0, 4))
-    sp_max_row, sp_max_scale, _ = ui_labeled_slider(
-        sp_max_section,
-        "MaxSpawnedAI",
-        sp_max_spawned_ai,
-        from_=80,
-        to=1000,
-        resolution=10,
-    )
-    tk.Label(sp_max_section, text="Range 80–1000 (vanilla 80)", fg="#666666", font=("Arial", 8)).pack(anchor="w", pady=(0, 2))
-    sp_max_warn_container = tk.Frame(sp_max_section)
-    sp_max_warn_container.pack(fill="x", pady=(0, 2))
-    sp_max_warn = tk.Label(sp_max_warn_container, text="", font=("Arial", 8))
-    sp_max_warn.pack(anchor="center")
-
-    # Simple mode: helper text only (shown when Advanced OFF)
-    sp_simple_frame = tk.Frame(spawn_controls_frame)
-    sp_simple_helper = tk.Label(
-        sp_simple_frame,
-        text="Spawn logic is auto-tuned from MaxSpawnedAI for stability.",
-        fg="#666666",
-        font=("Arial", 8),
-    )
-    sp_simple_helper.pack(anchor="w", pady=(0, 4))
-
-    # Advanced mode: full controls (shown when Advanced ON)
-    sp_advanced_frame = tk.Frame(spawn_controls_frame)
-
-    sp_auto_frame = tk.Frame(sp_advanced_frame)
-    sp_auto_frame.pack(fill="x", pady=(2, 4))
-    tk.Checkbutton(
-        sp_auto_frame,
-        text="Auto-adjust AI cache (recommended)",
-        variable=sp_auto_cache_var,
-        font=("Arial", 9),
-    ).pack(anchor="w")
-
-    sp_cache_slider_frame = tk.Frame(sp_advanced_frame)
-    ui_labeled_slider(
-        sp_cache_slider_frame,
-        "MaxSizeOfAICache (manual)",
-        sp_cache_manual,
-        from_=200,
-        to=2400,
-        resolution=50,
-    )
-    tk.Label(sp_cache_slider_frame, text="Only when auto-adjust is off. Range 200–2400.", fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 1))
-
-    def _sp_toggle_cache_slider(*_):
-        if sp_auto_cache_var.get():
-            sp_cache_slider_frame.pack_forget()
-        else:
-            sp_cache_slider_frame.pack(fill="x", pady=(4, 6), after=sp_auto_frame)
-    sp_auto_cache_var.trace_add("write", _sp_toggle_cache_slider)
-
-    ui_labeled_slider(
-        sp_advanced_frame,
-        "Dialog spawn limit",
-        sp_dialog_limit,
-        from_=50,
-        to=200,
-        resolution=5,
-    )
-    tk.Label(sp_advanced_frame, text="Debug is set to 2× Dialog automatically.", fg="#666666", font=("Arial", 8)).pack(fill="x", pady=(0, 1))
-
-    def _sp_update_1000_warning(*_):
-        v = int(sp_max_spawned_ai.get())
-        msg = "⚠ Experimental value." if v == 1000 else ""
-        sp_max_warn.config(text=msg, fg="red" if v == 1000 else "#666666")
-
-    def _sp_sync_from_max_spawned_ai(*_):
-        """Sync dependent vars from MaxSpawnedAI regardless of Advanced Spawning state.
-        <=500: vanilla (dialog 50, dynamic 0, ai_density 63)
-        >500 and <=800: dialog 200, dynamic 100, ai_density 203
-        >800: dialog 200, dynamic 100, ai_density 353
-        Only .set() if value differs to avoid recursion.
-        """
-        max_ai = int(sp_max_spawned_ai.get())
-        if max_ai <= 500:
-            want_dialog, want_dynamic, want_ai = 50, 0, 63
-        elif max_ai <= 800:
-            want_dialog, want_dynamic, want_ai = 200, 100, 203
-        else:
-            want_dialog, want_dynamic, want_ai = 200, 100, 353
-
-        if sp_dialog_limit.get() != want_dialog:
-            sp_dialog_limit.set(want_dialog)
-        if sp_dynamic_spawner_master.get() != want_dynamic:
-            sp_dynamic_spawner_master.set(want_dynamic)
-        if sp_ai_density_max.get() != want_ai:
-            sp_ai_density_max.set(want_ai)
-
-    sp_max_spawned_ai.trace_add("write", _sp_update_1000_warning)
-    sp_max_spawned_ai.trace_add("write", _sp_sync_from_max_spawned_ai)
-    _sp_update_1000_warning()
-    _sp_sync_from_max_spawned_ai()
-
-    sp_adv_sliders_frame = tk.Frame(sp_advanced_frame)
-    sp_adv_sliders_frame.pack(fill="x", pady=(2, 4))
-    ui_labeled_slider(
-        sp_adv_sliders_frame,
-        "Dynamic Spawner",
-        sp_dynamic_spawner_master,
-        from_=0,
-        to=100,
-        resolution=5,
-    )
-    tk.Label(
-        sp_adv_sliders_frame,
-        text="0% = defaults, 100% = max limits (AIProxy 160, Agenda 120, Challenge 200, Spawner 300)",
-        fg="#666666",
-        font=("Arial", 8),
-    ).pack(anchor="w", pady=(0, 2))
-
-    sp_darkzones_frame = tk.Frame(sp_advanced_frame)
-    sp_darkzones_frame.pack(fill="x", pady=(2, 2))
-    tk.Checkbutton(
-        sp_darkzones_frame,
-        text="Boost dark zones (DarkzoneNight 85, DarkzoneDay 100)",
-        variable=sp_boost_darkzones_var,
-        font=("Arial", 9),
-    ).pack(anchor="w")
-
-    sp_dyn_logic_label = tk.Label(
-        sp_advanced_frame,
-        text="Density and Radius)",
-        font=("Arial", 11, "bold"),
-    )
-    sp_dyn_logic_label.pack(pady=(10, 2))
-    ui_labeled_slider(
-        sp_advanced_frame,
-        "SpawnRadiusNight",
-        sp_spawn_radius_night,
-        from_=20.0,
-        to=90.0,
-        resolution=1.0,
-    )
-    ui_labeled_slider(
-        sp_advanced_frame,
-        "InnerRadiusSpawnNight / Day",
-        sp_inner_radius_spawn,
-        from_=10.5,
-        to=30.0,
-        resolution=0.5,
-    )
-    ui_labeled_slider(
-        sp_advanced_frame,
-        "AIDensityMaxAIsInSpawnArea",
-        sp_ai_density_max,
-        from_=63,
-        to=600,
-        resolution=10,
-    )
-    sp_ai_density_ignore_frame = tk.Frame(sp_advanced_frame)
-    sp_ai_density_ignore_frame.pack(fill="x", pady=(2, 2))
-    cb_ai_density_ignore = tk.Checkbutton(
-        sp_ai_density_ignore_frame,
-        text="AIDensityIgnoreDefault = true",
-        variable=sp_ai_density_ignore_var,
-        font=("Arial", 9),
-    )
-    cb_ai_density_ignore.pack(anchor="w")
-
-    def _sp_sync_ai_density_ignore(*_):
-        v = int(sp_ai_density_max.get())
-        if v != 63:
-            sp_ai_density_ignore_var.set(True)
-            cb_ai_density_ignore.config(state="disabled")
-        else:
-            cb_ai_density_ignore.config(state="normal")
-
-    sp_ai_density_max.trace_add("write", _sp_sync_ai_density_ignore)
-
-    def _sp_toggle_advanced_mode(*_):
-        if sp_advanced_tuning_var.get():
-            en_spawn_frame.pack(fill="x", pady=(4, 2), after=sp_advanced_tuning_frame)
-            sp_simple_frame.pack_forget()
-            sp_advanced_frame.pack(fill="x", pady=(0, 4), after=sp_max_section)
-        else:
-            en_spawn_frame.pack_forget()
-            sp_advanced_frame.pack_forget()
-            sp_simple_frame.pack(fill="x", pady=(0, 4), after=sp_max_section)
-
-    def refresh_enemies_spawn_ui():
-        _sp_toggle_advanced_mode()
-
-    sp_advanced_tuning_var.trace_add("write", _sp_toggle_advanced_mode)
-
-    # Initial state: Advanced OFF -> simple mode
-    if not sp_advanced_tuning_var.get():
-        sp_simple_frame.pack(fill="x", pady=(0, 4), after=sp_max_section)
-    else:
-        en_spawn_frame.pack(fill="x", pady=(4, 2), after=sp_advanced_tuning_frame)
-        sp_advanced_frame.pack(fill="x", pady=(0, 4), after=sp_max_section)
-    if sp_advanced_tuning_var.get() and sp_auto_cache_var.get():
-        sp_cache_slider_frame.pack_forget()
-
-    if not SPAWNS_SUPPORTED:
-        disable_children(spawn_controls_frame)
 
     preset_vars = [
         # --- XP ---
@@ -5449,30 +6540,20 @@ def build_ui():
         ("pl_boost_speed_pct", pl_boost_speed_pct),
         ("pl_ladder_climb_slow_var", pl_ladder_climb_slow_var),
         ("pl_fast_climb_enabled_var", pl_fast_climb_enabled_var),
-        ("en_spawn_priority_var", en_spawn_priority_var),
-        ("sp_max_spawned_ai", sp_max_spawned_ai),
-        ("sp_auto_cache_var", sp_auto_cache_var),
+        ("jump_boost_var", jump_boost_var),
+        ("jump_override_var", jump_override_var),
         ("sp_dialog_limit", sp_dialog_limit),
         ("sp_chase_limit", sp_chase_limit),
-        ("sp_cache_manual", sp_cache_manual),
-        ("sp_advanced_tuning_var", sp_advanced_tuning_var),
-        ("sp_boost_darkzones_var", sp_boost_darkzones_var),
-        ("sp_dynamic_spawner_master", sp_dynamic_spawner_master),
-        ("sp_spawn_radius_night", sp_spawn_radius_night),
-        ("sp_inner_radius_spawn", sp_inner_radius_spawn),
-        ("sp_ai_density_max", sp_ai_density_max),
-        ("sp_ai_density_ignore_var", sp_ai_density_ignore_var),
     ]
 
     return {
-        "notebook": notebook,  # Works for multiple tabs
-        "xp_tab": xp_tab,  # MAIN XP
-        "flashlight_tab": flashlight_tab,  # flashlight
-        "night_tab": night_tab,
+        "notebook": notebook,
+        "main_tab": main_tab,
+        "xp_tab": xp_tab,
+        "flashlight_tab": flashlight_tab,
         "btn_auto": btn_auto,
         "btn_select": btn_select,
         "callout_box": callout_box,
-        "callout_game_path_label": callout_game_path_label,
         "rb_ow": rb_ow,
         "rb_leg": rb_leg,
         "openworld_frame": openworld_frame,  # openworldXP
@@ -5490,7 +6571,6 @@ def build_ui():
         "btn_reset_vo": btn_reset_vo,  # reset volatiles values
         "btn_reset_vh": btn_reset_vh,
         "btn_reset_en": btn_reset_en,
-        "refresh_enemies_spawn_ui": refresh_enemies_spawn_ui,
         "btn_hu_off": btn_hu_off,  # Hunger off
         "btn_restore_hunger": btn_restore_hunger,
         "btn_load_preset": btn_load_preset,
@@ -5501,13 +6581,15 @@ def build_ui():
         "vo_reduce_pct_var": vo_reduce_pct_var,
         "save_path_var": save_path_var,
         "save_path_callout_box": save_path_callout_box,
-        "save_path_callout_label": save_path_callout_label,
-        "save_path_check_label": save_path_check_label,
         "veh_binds": veh_binds,
         "fuel_usage_pct": fuel_usage_pct,
         "fuel_max_pct": fuel_max_pct,
         "en_tag_hp_vars": en_tag_hp_vars,
+        "jump_boost_var": jump_boost_var,
+        "jump_override_var": jump_override_var,
     }
+    
+
 
 
 # -----------------------------
@@ -5529,7 +6611,6 @@ def main():
     btn_auto = ui["btn_auto"]
     btn_select = ui["btn_select"]
     callout_box = ui["callout_box"]
-    callout_game_path_label = ui["callout_game_path_label"]
     btn_load_preset = ui.get("btn_load_preset")
     btn_save_preset = ui.get("btn_save_preset")
     preset_vars = ui.get("preset_vars", [])
@@ -5545,12 +6626,12 @@ def main():
     vo_reduce_pct_var = ui["vo_reduce_pct_var"]
     save_path_var = ui["save_path_var"]
     save_path_callout_box = ui["save_path_callout_box"]
-    save_path_callout_label = ui["save_path_callout_label"]
-    save_path_check_label = ui["save_path_check_label"]
     veh_binds = ui["veh_binds"]
     fuel_usage_pct = ui["fuel_usage_pct"]
     fuel_max_pct = ui["fuel_max_pct"]
     en_tag_hp_vars = ui["en_tag_hp_vars"]
+    jump_boost_var = ui["jump_boost_var"]
+    jump_override_var = ui["jump_override_var"]
 
     refresh_advanced = ui.get("refresh_advanced")
     refresh_flashlight_advanced = ui.get("refresh_flashlight_advanced")
@@ -5600,8 +6681,6 @@ def main():
         inputs_keyboard_patchers.append(patch_disable_layout_keybinding_for_action("_ACTION_HORN"))
         inputs_keyboard_patchers.append(patch_disable_layout_keybinding_for_action("_ACTION_VEHICLE_REDIRECT_TO_SAFE_HOUSE"))
         inputs_keyboard_patchers.append(patch_disable_layout_keybinding_for_action("_ACTION_CAR_LIGHTS_UV"))
-
-
 
 
         # --- Hunger patches ---
@@ -5659,7 +6738,15 @@ def main():
 
         if hunger_restore_full_var.get():
             player_patchers.append(patch_restore_hunger_to_full(1000.0))
-
+            
+        # Jump + fall
+        player_patchers.append(
+            lambda c, ui=ui: patch_jump_and_fall_direct(
+                c,
+                ui["jump_boost_var"].get(),
+                ui["jump_override_var"].get()
+            )
+        )
         # -----------------
         # Alpha volatile (apex)
         # -----------------
@@ -6187,10 +7274,8 @@ def main():
         )
         if path_ok:
             callout_box.config(highlightthickness=0)
-            callout_game_path_label.config(text="Game path detected", fg="#228b22")
         else:
             callout_box.config(highlightthickness=2, highlightbackground="#d00000")
-            callout_game_path_label.config(text="IMPORTANT: Set game folder first", fg="#d00000")
 
         if not path_ok:
             set_status(
@@ -6346,6 +7431,7 @@ def main():
             ) = get_patchers_for_build(_veh_binds)
 
             write_player_variables(player_patchers)
+            deploy_enabled_mod_files(Path(game_path_var.get().strip()))
             if prog_patchers:
                 write_progression_actions(prog_patchers)
             if inv_patchers:
@@ -6417,7 +7503,7 @@ def main():
             game_path_var.set(path)
             save_game_path(path)
             refresh_buttons()
-            
+                        
     def backup_player_save(src_str: str):
         src_str = (src_str or "").strip()
         if not src_str:
@@ -6455,12 +7541,8 @@ def main():
         path_set = bool((save_path_var.get() or "").strip())
         if path_set:
             save_path_callout_box.config(highlightthickness=0)
-            save_path_callout_label.pack_forget()
-            save_path_check_label.pack(side="left", padx=(0, 8))
         else:
             save_path_callout_box.config(highlightthickness=2, highlightbackground="#d00000")
-            save_path_callout_label.pack(fill="x", pady=(0, 4))
-            save_path_check_label.pack_forget()
     update_save_path_callout()
     save_path_var.trace_add("write", update_save_path_callout)
 
