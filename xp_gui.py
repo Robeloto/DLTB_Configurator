@@ -339,10 +339,24 @@ def flatten_single_root_folder(dest: Path):
             shutil.move(str(p), str(dest / p.name))
         shutil.rmtree(root, ignore_errors=True)
 
+
+
 def install_mod_archive_button():
-    archive = pick_mod_archive()
+    # Visa direkt att något händer (innan fil-dialogen)
+    status([("Opening file dialog…", "warn")])
+    root.update_idletasks()
+
+    t0 = time.perf_counter()
+    archive = pick_mod_archive()  # Path eller None
+    dt_dialog = time.perf_counter() - t0
+
     if not archive:
+        status([("Cancelled.", "warn")])
         return
+
+    status([(f"Selected: {archive.name} (dialog {dt_dialog:.1f}s)", "ok"),
+            ("Preparing install…", "warn")])
+    root.update_idletasks()
 
     mod_name = archive.stem
     mod_root = MODS_DIR / mod_name
@@ -350,24 +364,36 @@ def install_mod_archive_button():
 
     MODS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # overwrite-fråga
+    # overwrite-fråga (du kan byta bort messagebox senare om du vill)
     if mod_root.exists():
         if not messagebox.askyesno("Overwrite?", f"{mod_name} already exists. Overwrite?"):
+            status([("Install aborted (not overwriting).", "warn")])
             return
         shutil.rmtree(mod_root, ignore_errors=True)
 
     raw_dir.mkdir(parents=True, exist_ok=True)
 
+    status([("Extracting archive…", "warn")])
+    root.update_idletasks()
+
+    t1 = time.perf_counter()
     ok = extract_archive(archive, raw_dir)
+    dt_extract = time.perf_counter() - t1
+
     if not ok:
         shutil.rmtree(mod_root, ignore_errors=True)
+        status([("Extract failed. Nothing was installed.", "warn")])
         return
 
     # optional
     flatten_single_root_folder(raw_dir)
 
+    status([(f"Extract OK ({dt_extract:.2f}s). Indexing files…", "ok")])
+    root.update_idletasks()
+
     # indexera filer
-    files = [str(p.relative_to(raw_dir)).replace("\\", "/") for p in raw_dir.rglob("*") if p.is_file()]
+    files = [str(p.relative_to(raw_dir)).replace("\\", "/")
+             for p in raw_dir.rglob("*") if p.is_file()]
     scr_files = [f for f in files if f.lower().endswith(".scr")]
 
     manifest = {
@@ -381,11 +407,15 @@ def install_mod_archive_button():
         "priority": {},  # ex: {"player_variables.scr": "mod_wins"}
     }
 
-    (mod_root / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    status([("Writing manifest…", "warn")])
+    root.update_idletasks()
 
-    # Status i GUI (inga popups)
+    (mod_root / "manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8"
+    )
+
     status([
-        (" Mod added to Configurator ✔  ", "ok"),
+        ("Mod added to Configurator ✔", "ok"),
         ("Next: Deploy → Apply → Build & Install PAK", "warn"),
     ])
 
@@ -4751,7 +4781,7 @@ def build_ui():
     # --- Mods tab ---
     for child in mods_tab.winfo_children():
         child.destroy()
-
+    
     # MÅSTE komma före att du använder en_adv_scroll_inner
     en_adv_scroll_outer, en_adv_scroll_inner = create_scrollable_frame(mods_tab)
     en_adv_scroll_outer.pack(fill="both", expand=True)
